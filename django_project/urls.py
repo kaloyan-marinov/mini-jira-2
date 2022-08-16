@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from projects.views import get_or_post_to_projects, put_or_delete_to_project
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("projects", get_or_post_to_projects),
+    path("projects/<int:id>", put_or_delete_to_project),
 ]
