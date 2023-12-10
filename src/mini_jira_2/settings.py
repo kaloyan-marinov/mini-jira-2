@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "src.tasks.apps.TasksConfig",
 ]
 
 MIDDLEWARE = [
@@ -49,7 +51,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "mini_jira_2.urls"
+ROOT_URLCONF = "src.mini_jira_2.urls"
 
 TEMPLATES = [
     {
@@ -67,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "mini_jira_2.wsgi.application"
+WSGI_APPLICATION = "src.mini_jira_2.wsgi.application"
 
 
 # Database

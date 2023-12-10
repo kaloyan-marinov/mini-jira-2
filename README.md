@@ -1,3 +1,5 @@
+# Create a virtual environment
+
 ```bash
 $ python3 --version
 Python 3.8.3
@@ -7,6 +9,8 @@ $ source venv/bin/activate
 (venv) $ pip install --upgrade pip
 (venv) $ pip install -r requirements.txt
 ```
+
+# Run the test suite
 
 Run all test cases:
 ```bash
@@ -28,7 +32,7 @@ Name                               Stmts   Miss  Cover   Missing
 src/manage.py                         12     12     0%   2-22
 src/mini_jira_2/__init__.py            0      0   100%
 src/mini_jira_2/asgi.py                4      4     0%   10-16
-src/mini_jira_2/settings.py           18     18     0%   13-123
+src/mini_jira_2/settings.py           18     18     0%   13-125
 src/mini_jira_2/urls.py                3      3     0%   17-20
 src/mini_jira_2/wsgi.py                4      4     0%   10-16
 src/tasks/__init__.py                  0      0   100%
@@ -37,17 +41,54 @@ src/tasks/apps.py                      4      4     0%   1-6
 src/tasks/migrations/__init__.py       0      0   100%
 src/tasks/models.py                    1      1     0%   1
 src/tasks/tests.py                     1      1     0%   1
-src/tasks/views.py                     1      1     0%   1
+src/tasks/urls.py                      3      3     0%   1-4
+src/tasks/views.py                     7      7     0%   1-28
 src/utilities_temp.py                  4      1    75%   6
 ----------------------------------------------------------------
-TOTAL                                 53     50     6%
+TOTAL                                 62     59     5%
 
 
-=================================================================== 2 passed in 0.25s ====================================================================
+=================================================================== 2 passed in 0.23s ====================================================================
 ```
 
 Run an individual test case:
 ```bash
 (venv) $ PYTHONPATH=. pytest tests/test_utilities_temp.py::test_add_1
 # ...
+```
+
+# Launch a process responsible for serving the web application
+
+```bash
+# Launch one terminal instance and, in it, start serving the application:
+(venv) $ PYTHONPATH=. python src/manage.py runserver
+```
+
+```bash
+# Launch a second terminal instance and, in it, issue requests to the application:
+$ curl localhost:8000/api/tasks \
+    | json_pp
+
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--100   245  100   245    0     0   9306      0 --:--:-- --:--:-- --:--:-- 17500
+{
+   "items" : [
+      {
+         "category" : "health",
+         "description" : "go to the doctor",
+         "id" : 1
+      },
+      {
+         "category" : "work",
+         "description" : "build a web application using Django",
+         "id" : 2
+      },
+      {
+         "category" : "vacation",
+         "description" : "look up interesting towns in Sicily to visit",
+         "id" : 3
+      }
+   ]
+}
 ```
