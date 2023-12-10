@@ -10,7 +10,27 @@ $ source venv/bin/activate
 
 Run all test cases:
 ```bash
-(venv) $ PYTHONPATH=. pytest
+(venv) $ PYTHONPATH=. pytest \
+    --cov=src/ \
+    --cov-report=term-missing
+
+========================================================================= test session starts ==========================================================================
+platform darwin -- Python 3.8.3, pytest-7.4.3, pluggy-1.3.0
+rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
+plugins: cov-4.1.0
+collected 2 items                                                                                                                                                      
+
+tests/test_utilities_temp.py ..                                                                                                                                  [100%]
+
+---------- coverage: platform darwin, python 3.8.3-final-0 -----------
+Name                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------
+src/utilities_temp.py       4      1    75%   6
+-----------------------------------------------------
+TOTAL                       4      1    75%
+
+
+========================================================================== 2 passed in 0.21s ===========================================================================
 ```
 
 Run an individual test case:
