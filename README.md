@@ -63,6 +63,18 @@ Run an individual test case:
 
 ```bash
 # Launch one terminal instance and, in it, start serving the application:
+(venv) $ PYTHONPATH=. python src/manage.py migrate
+
+(venv) mini-jira-2 $ sqlite3 src/db.sqlite3 
+sqlite> .mode columns
+sqlite> .headers on
+sqlite> .tables
+auth_group                  auth_user_user_permissions
+auth_group_permissions      django_admin_log          
+auth_permission             django_content_type       
+auth_user                   django_migrations         
+auth_user_groups            django_session
+
 (venv) $ PYTHONPATH=. python src/manage.py runserver
 ```
 
