@@ -28,28 +28,29 @@ tests/test_utilities_temp.py ..                                                 
 tests/tasks/test_views.py .                                                                                                                        [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
-Name                               Stmts   Miss  Cover   Missing
-----------------------------------------------------------------
-src/manage.py                         12     12     0%   2-22
-src/mini_jira_2/__init__.py            0      0   100%
-src/mini_jira_2/asgi.py                4      4     0%   10-16
-src/mini_jira_2/settings.py           18      0   100%
-src/mini_jira_2/urls.py                3      0   100%
-src/mini_jira_2/wsgi.py                4      4     0%   10-16
-src/tasks/__init__.py                  0      0   100%
-src/tasks/admin.py                     1      0   100%
-src/tasks/apps.py                      4      0   100%
-src/tasks/migrations/__init__.py       0      0   100%
-src/tasks/models.py                    1      0   100%
-src/tasks/tests.py                     1      1     0%   1
-src/tasks/urls.py                      3      0   100%
-src/tasks/views.py                     7      0   100%
-src/utilities_temp.py                  4      1    75%   6
-----------------------------------------------------------------
-TOTAL                                 62     22    65%
+Name                                   Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------
+src/manage.py                             12     12     0%   2-22
+src/mini_jira_2/__init__.py                0      0   100%
+src/mini_jira_2/asgi.py                    4      4     0%   10-16
+src/mini_jira_2/settings.py               18      0   100%
+src/mini_jira_2/urls.py                    3      0   100%
+src/mini_jira_2/wsgi.py                    4      4     0%   10-16
+src/tasks/__init__.py                      0      0   100%
+src/tasks/admin.py                         1      0   100%
+src/tasks/apps.py                          4      0   100%
+src/tasks/migrations/0001_initial.py       5      5     0%   3-11
+src/tasks/migrations/__init__.py           0      0   100%
+src/tasks/models.py                        4      0   100%
+src/tasks/tests.py                         1      1     0%   1
+src/tasks/urls.py                          3      0   100%
+src/tasks/views.py                         7      0   100%
+src/utilities_temp.py                      4      1    75%   6
+--------------------------------------------------------------------
+TOTAL                                     70     27    61%
 
 
-=================================================================== 3 passed in 1.22s ====================================================================
+=================================================================== 3 passed in 1.16s ====================================================================
 ```
 
 Run an individual test case:
@@ -69,11 +70,12 @@ Run an individual test case:
 sqlite> .mode columns
 sqlite> .headers on
 sqlite> .tables
-auth_group                  auth_user_user_permissions
-auth_group_permissions      django_admin_log          
-auth_permission             django_content_type       
-auth_user                   django_migrations         
-auth_user_groups            django_session
+auth_group                  django_admin_log          
+auth_group_permissions      django_content_type       
+auth_permission             django_migrations         
+auth_user                   django_session            
+auth_user_groups            tasks_task                
+auth_user_user_permissions
 
 (venv) $ PYTHONPATH=. python src/manage.py runserver
 ```
