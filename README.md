@@ -24,8 +24,8 @@ rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
 plugins: cov-4.1.0, django-4.7.0
 collected 3 items                                                                                                                                        
 
-tests/test_utilities_temp.py ..                                                                                                                    [ 66%]
-tests/tasks/test_views.py .                                                                                                                        [100%]
+tests/tasks/test_views.py .                                                                                                                        [ 33%]
+tests/test_utilities_temp.py ..                                                                                                                    [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
 Name                                   Stmts   Miss  Cover   Missing
@@ -39,18 +39,18 @@ src/mini_jira_2/wsgi.py                    4      4     0%   10-16
 src/tasks/__init__.py                      0      0   100%
 src/tasks/admin.py                         1      0   100%
 src/tasks/apps.py                          4      0   100%
-src/tasks/migrations/0001_initial.py       5      5     0%   3-11
+src/tasks/migrations/0001_initial.py       5      0   100%
 src/tasks/migrations/__init__.py           0      0   100%
 src/tasks/models.py                        4      0   100%
 src/tasks/tests.py                         1      1     0%   1
 src/tasks/urls.py                          3      0   100%
-src/tasks/views.py                         7      0   100%
+src/tasks/views.py                         9      0   100%
 src/utilities_temp.py                      4      1    75%   6
 --------------------------------------------------------------------
-TOTAL                                     70     27    61%
+TOTAL                                     72     22    69%
 
 
-=================================================================== 3 passed in 1.16s ====================================================================
+=================================================================== 3 passed in 2.48s ====================================================================
 ```
 
 Run an individual test case:
@@ -87,24 +87,8 @@ $ curl localhost:8000/api/tasks \
 
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--100   245  100   245    0     0   9306      0 --:--:-- --:--:-- --:--:-- 17500
+100    12  100    12    0     0    427      0 --:--:-- --:--:-- --:--:--   800
 {
-   "items" : [
-      {
-         "category" : "health",
-         "description" : "go to the doctor",
-         "id" : 1
-      },
-      {
-         "category" : "work",
-         "description" : "build a web application using Django",
-         "id" : 2
-      },
-      {
-         "category" : "vacation",
-         "description" : "look up interesting towns in Sicily to visit",
-         "id" : 3
-      }
-   ]
+   "items" : []
 }
 ```

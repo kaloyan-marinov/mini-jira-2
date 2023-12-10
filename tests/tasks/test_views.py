@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from django.test import Client
 
@@ -59,6 +60,7 @@ django.setup()
 # fmt: on
 
 
+@pytest.mark.django_db
 def test_get_tasks():
     # Arrange.
     client = Client()
@@ -69,21 +71,5 @@ def test_get_tasks():
     # Assert.
     assert response.status_code == 200
     assert response.json() == {
-        "items": [
-            {
-                "id": 1,
-                "category": "health",
-                "description": "go to the doctor",
-            },
-            {
-                "id": 2,
-                "category": "work",
-                "description": "build a web application using Django",
-            },
-            {
-                "id": 3,
-                "category": "vacation",
-                "description": "look up interesting towns in Sicily to visit",
-            },
-        ],
+        "items": [],
     }

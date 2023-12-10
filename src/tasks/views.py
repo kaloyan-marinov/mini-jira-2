@@ -3,26 +3,20 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from .models import Task
+
 
 @api_view(["GET"])
 def get_tasks(request):
+    tasks = Task.objects.all()
     data = {
         "items": [
             {
-                "id": 1,
-                "category": "health",
-                "description": "go to the doctor",
-            },
-            {
-                "id": 2,
-                "category": "work",
-                "description": "build a web application using Django",
-            },
-            {
-                "id": 3,
-                "category": "vacation",
-                "description": "look up interesting towns in Sicily to visit",
-            },
+                "id": t.id,
+                "category": t.category,
+                "description": t.description,
+            }
+            for t in tasks
         ]
     }
     return Response(data)
