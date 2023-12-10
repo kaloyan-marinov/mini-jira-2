@@ -14,23 +14,29 @@ Run all test cases:
     --cov=src/ \
     --cov-report=term-missing
 
-========================================================================= test session starts ==========================================================================
+================================================================== test session starts ===================================================================
 platform darwin -- Python 3.8.3, pytest-7.4.3, pluggy-1.3.0
 rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
-plugins: cov-4.1.0
-collected 2 items                                                                                                                                                      
+plugins: cov-4.1.0, django-4.7.0
+collected 2 items                                                                                                                                        
 
-tests/test_utilities_temp.py ..                                                                                                                                  [100%]
+tests/test_utilities_temp.py ..                                                                                                                    [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
-Name                    Stmts   Miss  Cover   Missing
------------------------------------------------------
-src/utilities_temp.py       4      1    75%   6
------------------------------------------------------
-TOTAL                       4      1    75%
+Name                          Stmts   Miss  Cover   Missing
+-----------------------------------------------------------
+src/manage.py                    12     12     0%   2-22
+src/mini_jira_2/__init__.py       0      0   100%
+src/mini_jira_2/asgi.py           4      4     0%   10-16
+src/mini_jira_2/settings.py      18     18     0%   13-123
+src/mini_jira_2/urls.py           3      3     0%   17-20
+src/mini_jira_2/wsgi.py           4      4     0%   10-16
+src/utilities_temp.py             4      1    75%   6
+-----------------------------------------------------------
+TOTAL                            45     42     7%
 
 
-========================================================================== 2 passed in 0.21s ===========================================================================
+=================================================================== 2 passed in 0.19s ====================================================================
 ```
 
 Run an individual test case:
