@@ -52,16 +52,50 @@ is implemented by
 the code-block that follows this comment.
 '''
 # fmt: on
-
 os.environ["DJANGO_SETTINGS_MODULE"] = "src.mini_jira_2.settings"
 import django
 
 django.setup()
 # fmt: on
 
+from src.tasks.models import Task
+
 
 @pytest.mark.django_db
-def test_get_tasks():
+def test_process_tasks_1_post():
+    """
+    If the request body contains values for each of 'category' and 'description',
+    then a new `Task` should be created successfully.
+    """
+
+    # Arrange.
+    client = Client()
+
+    # Act.
+    response = client.post(
+        "/api/tasks",
+        data={
+            "category": "health",
+            "description": "go to the doctor",
+        },
+    )
+
+    # Assert.
+    assert response.status_code == 201
+    assert response.json() == {
+        "id": 1,
+        "category": "health",
+        "description": "go to the doctor",
+    }
+
+
+@pytest.mark.django_db
+def test_process_tasks_2_get():
+    """
+    If no `Task`s have been created,
+    then getting all `Task`s should return an empty list.
+    """
+
     # Arrange.
     client = Client()
 
@@ -73,3 +107,139 @@ def test_get_tasks():
     assert response.json() == {
         "items": [],
     }
+
+
+@pytest.mark.django_db
+def test_process_tasks_3_get():
+    """
+    If `Task`s have been created,
+    then getting all `Task`s should return
+    a list containing representations of all `Task`s.
+    """
+
+    # Arrange.
+    client = Client()
+
+    _ = client.post(
+        "/api/tasks",
+        data={
+            "category": "health",
+            "description": "go to the doctor",
+        },
+    )
+
+    _ = client.post(
+        "/api/tasks",
+        data={
+            "category": "work",
+            "description": "build a web application using Django",
+        },
+    )
+
+    # Act.
+    response = client.get("/api/tasks")
+
+    # Assert.
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            {
+                "id": 1,
+                "category": "health",
+                "description": "go to the doctor",
+            },
+            {
+                "id": 2,
+                "category": "work",
+                "description": "build a web application using Django",
+            },
+        ]
+    }
+
+
+@pytest.mark.django_db
+def test_process_task_1_get():
+    """
+    Requesting to retrieve an existing `Task`
+    should return a representation of that `Task`.
+    """
+
+    # Arrange.
+    client = Client()
+
+    _ = client.post(
+        "/api/tasks",
+        data={
+            "category": "health",
+            "description": "go to the doctor",
+        },
+    )
+
+    # Act.
+    response = client.get("/api/tasks/1")
+
+    # Assert.
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "category": "health",
+        "description": "go to the doctor",
+    }
+
+
+@pytest.mark.django_db
+def test_process_task_2_put():
+    # Arrange.
+    client = Client()
+
+    _ = client.post(
+        "/api/tasks",
+        data={
+            "category": "helthh",
+            "description": "go to the dctr",
+        },
+    )
+
+    # Act.
+    response = client.put(
+        "/api/tasks/1",
+        data={
+            "category": "health",
+            "description": "go to the doctor",
+        },
+        content_type="application/json",
+    )
+
+    # Assert.
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "category": "health",
+        "description": "go to the doctor",
+    }
+
+    e = Task.objects.get(id=1)
+    assert e.category == "health"
+    assert e.description == "go to the doctor"
+
+
+@pytest.mark.django_db
+def test_process_task_3_delete():
+    # Arrange.
+    client = Client()
+
+    _ = client.post(
+        "/api/tasks",
+        data={
+            "category": "health",
+            "description": "go to the doctor",
+        },
+    )
+
+    # Act.
+    response = client.delete("/api/tasks/1")
+
+    # Assert.
+    assert response.status_code == 204
+
+    assert Task.objects.count() == 0
