@@ -15,6 +15,15 @@ The main principle undergirding the development of `MiniJira` is as follows:
   but rather focus on _minimalism_
   that is _sufficient_ for ensuring _effective_ progress and completion of projects.
 
+# Ensure that secrets/credentials are handled/managed with care (aka "protected")
+
+```bash
+$ cp \
+   .env.template \
+   .env
+# Edit the content of `.env` as per the comments/instructions therein.
+```
+
 # Create a virtual environment
 
 ```bash
@@ -39,9 +48,9 @@ Run all test cases:
 platform darwin -- Python 3.8.3, pytest-7.4.3, pluggy-1.3.0
 rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
 plugins: cov-4.1.0, django-4.7.0
-collected 6 items                                                              
+collected 6 items                                                                                                                                          
 
-tests/tasks/test_views.py ......                                         [100%]
+tests/tasks/test_views.py ......                                                                                                                     [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
 Name                                   Stmts   Miss  Cover   Missing
@@ -49,7 +58,7 @@ Name                                   Stmts   Miss  Cover   Missing
 src/manage.py                             12     12     0%   2-22
 src/mini_jira_2/__init__.py                0      0   100%
 src/mini_jira_2/asgi.py                    4      4     0%   10-16
-src/mini_jira_2/settings.py               18      0   100%
+src/mini_jira_2/settings.py               21      0   100%
 src/mini_jira_2/urls.py                    3      0   100%
 src/mini_jira_2/wsgi.py                    4      4     0%   10-16
 src/tasks/__init__.py                      0      0   100%
@@ -62,10 +71,10 @@ src/tasks/tests.py                         1      1     0%   1
 src/tasks/urls.py                          3      0   100%
 src/tasks/views.py                        35      1    97%   27
 --------------------------------------------------------------------
-TOTAL                                     94     22    77%
+TOTAL                                     97     22    77%
 
 
-============================== 6 passed in 3.90s ===============================
+============================== 6 passed in 4.06s ===============================
 ```
 
 Run an individual test case:
