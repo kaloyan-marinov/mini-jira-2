@@ -1,3 +1,20 @@
+# Introduction
+
+`MiniJira` is a web application
+that, as the name suggests, is a miniature version of Jira
+(= the well-known issue-tracking software product developed by Atlassian).
+
+The purpose of `MiniJira` is to facilitate
+the planning, execution, and completion of projects.
+Specifically, the emphasis is on projects owned and developed
+by a single individual (or by a _small_ number of contributors).
+
+The main principle undergirding the development of `MiniJira` is as follows:
+
+> The web application shall avoid fancy features,
+  but rather focus on _minimalism_
+  that is _sufficient_ for ensuring _effective_ progress and completion of projects.
+
 # Create a virtual environment
 
 ```bash
