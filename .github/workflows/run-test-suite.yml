@@ -43,9 +43,6 @@ jobs:
       - id: run-tests
         name: Run tests
         run: |
-          # Using the `-m` flag to run this python command
-          # will add the current directory to `sys.path`.
-          # python -m pytest
           PYTHONPATH=. pytest \
               --cov=src/ \
               --cov-report=term-missing \
