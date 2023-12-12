@@ -57,7 +57,7 @@ jobs:
           coverage_percentage=${arr[3]}
 
           badge_url="![badge-test-coverage](https://img.shields.io/static/v1?label=test-coverage&message=${coverage_percentage}25&color=black)"
-          echo "::set-output name=badge-url::${badge_url}"
+          echo "badge-url=${badge_url}" >> $GITHUB_OUTPUT
 
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs
   jobs_post-comment-containing-coverage-percentage-badge:
