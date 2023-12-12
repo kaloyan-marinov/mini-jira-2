@@ -42,36 +42,37 @@ Run all test cases:
 ```bash
 (venv) $ PYTHONPATH=. pytest \
     --cov=src/ \
-    --cov-report=term-missing
+    --cov-report=term-missing \
+    --cov-branch
 
 ============================= test session starts ==============================
 platform darwin -- Python 3.8.3, pytest-7.4.3, pluggy-1.3.0
 rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
 plugins: cov-4.1.0, django-4.7.0
-collected 6 items                                                                                                                                          
+collected 6 items                                                                                                                                                                
 
-tests/tasks/test_views.py ......                                                                                                                     [100%]
+tests/tasks/test_views.py ......                                                                                                                                           [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
-Name                                   Stmts   Miss  Cover   Missing
---------------------------------------------------------------------
-src/manage.py                             12     12     0%   2-22
-src/mini_jira_2/__init__.py                0      0   100%
-src/mini_jira_2/asgi.py                    4      4     0%   10-16
-src/mini_jira_2/settings.py               21      0   100%
-src/mini_jira_2/urls.py                    3      0   100%
-src/mini_jira_2/wsgi.py                    4      4     0%   10-16
-src/tasks/__init__.py                      0      0   100%
-src/tasks/admin.py                         1      0   100%
-src/tasks/apps.py                          4      0   100%
-src/tasks/migrations/0001_initial.py       5      0   100%
-src/tasks/migrations/__init__.py           0      0   100%
-src/tasks/models.py                        4      0   100%
-src/tasks/tests.py                         1      1     0%   1
-src/tasks/urls.py                          3      0   100%
-src/tasks/views.py                        35      1    97%   27
---------------------------------------------------------------------
-TOTAL                                     97     22    77%
+Name                                   Stmts   Miss Branch BrPart  Cover   Missing
+----------------------------------------------------------------------------------
+src/manage.py                             12     12      2      0     0%   2-22
+src/mini_jira_2/__init__.py                0      0      0      0   100%
+src/mini_jira_2/asgi.py                    4      4      0      0     0%   10-16
+src/mini_jira_2/settings.py               21      0      0      0   100%
+src/mini_jira_2/urls.py                    3      0      0      0   100%
+src/mini_jira_2/wsgi.py                    4      4      0      0     0%   10-16
+src/tasks/__init__.py                      0      0      0      0   100%
+src/tasks/admin.py                         1      0      0      0   100%
+src/tasks/apps.py                          4      0      0      0   100%
+src/tasks/migrations/0001_initial.py       5      0      0      0   100%
+src/tasks/migrations/__init__.py           0      0      0      0   100%
+src/tasks/models.py                        4      0      0      0   100%
+src/tasks/tests.py                         1      1      0      0     0%   1
+src/tasks/urls.py                          3      0      0      0   100%
+src/tasks/views.py                        35      1     18      5    89%   27, 37->exit, 67->70, 71->74, 84->exit
+----------------------------------------------------------------------------------
+TOTAL                                     97     22     20      5    75%
 
 
 ============================== 6 passed in 4.06s ===============================
