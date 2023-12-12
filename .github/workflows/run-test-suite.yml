@@ -21,7 +21,7 @@ jobs:
 
   jobs_run-test-suite:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     outputs:
       badge-url: ${{ steps.run-tests.outputs.badge-url }}
