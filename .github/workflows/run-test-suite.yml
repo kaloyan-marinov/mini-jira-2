@@ -2,11 +2,20 @@ name: workflows_run-test-suite
 
 on:
   push:
-    branches: 
-      - main
-  pull_request:
-    branches:
-      - main
+  #   branches-ignore:
+  #     - "main"
+
+  # Runs your workflow when activity on a pull request in the workflow's repository
+  # occurs. For example, if no activity types are specified, the workflow runs
+  # when a pull request is opened or reopened
+  # or when the head branch of the pull request is updated.
+  # pull_request:
+  #   branches:
+  #     - main
+  # pull_request_target:
+
+  # Make it possible to run the workflow manually (from GitHub's web UI).
+  workflow_dispatch:
 
 jobs:
 
@@ -19,10 +28,10 @@ jobs:
 
     steps:
       - name: Check out repository onto runner
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8.3'
       
@@ -37,7 +46,10 @@ jobs:
           # Using the `-m` flag to run this python command
           # will add the current directory to `sys.path`.
           # python -m pytest
-          PYTHONPATH=. pytest --cov=src/ --cov-report=term-missing > line-with-the-TOTAL.txt
+          PYTHONPATH=. pytest \
+              --cov=src/ \
+              --cov-report=term-missing \
+              > line-with-the-TOTAL.txt
 
           read -r -a arr <<< $(grep TOTAL line-with-the-TOTAL.txt)
           coverage_percentage=${arr[3]}
