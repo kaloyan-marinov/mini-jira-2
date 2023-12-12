@@ -73,7 +73,7 @@ jobs:
       - id: create-badge-url
         name: Create badge with (test-)coverage percentage
         run: |
-          coverage_percentage = ${{ needs.jobs_run-test-suite.outputs.coverage-percentage }}
+          coverage_percentage="${{ needs.jobs_run-test-suite.outputs.coverage-percentage }}"
           badge_url="![badge-test-coverage](https://img.shields.io/static/v1?label=test-coverage&message=${coverage_percentage}25&color=black)"
           echo "badge_url=$badge_url" >> $GITHUB_OUTPUT
 
