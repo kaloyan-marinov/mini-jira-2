@@ -43,7 +43,13 @@ jobs:
       - id: run-tests
         name: Run tests
         run: |
-          echo $(date)
+          # Using the `-m` flag to run this python command
+          # will add the current directory to `sys.path`.
+          # python -m pytest
+          PYTHONPATH=. pytest \
+              --cov=src/ \
+              --cov-report=term-missing \
+              > line-with-the-TOTAL.txt
 
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs
   jobs_post-comment-containing-coverage-percentage-badge:
