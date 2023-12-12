@@ -43,7 +43,7 @@ jobs:
       - id: run-tests
         name: Run tests
         run: |
-          PYTHONPATH=. pytest \
+          python -m pytest \
               --cov=src/ \
               --cov-report=term-missing \
               > line-with-the-TOTAL.txt
