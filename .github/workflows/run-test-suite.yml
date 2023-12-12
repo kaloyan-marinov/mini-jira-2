@@ -21,7 +21,7 @@ jobs:
 
   jobs_run-test-suite:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     outputs:
       badge-url: ${{ steps.run-tests.outputs.badge-url }}
@@ -37,15 +37,27 @@ jobs:
       
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
       
       - id: run-tests
         name: Run tests
         run: |
-          python -m pytest \
+          echo "DJANGO_SECRET_KEY=123" > .env
+
+          # Using the `-m` flag to run this python command
+          # will add the current directory to `sys.path`.
+          # python -m pytest
+          PYTHONPATH=. pytest \
               --cov=src/ \
-              --cov-report=term-missing
+              --cov-report=term-missing \
+              > line-with-the-TOTAL.txt
+
+          read -r -a arr <<< $(grep TOTAL line-with-the-TOTAL.txt)
+          coverage_percentage=${arr[3]}
+
+          badge_url="![badge-test-coverage](https://img.shields.io/static/v1?label=test-coverage&message=${coverage_percentage}25&color=black)"
+          echo "::set-output name=badge-url::${badge_url}"
 
   # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs
   jobs_post-comment-containing-coverage-percentage-badge:
