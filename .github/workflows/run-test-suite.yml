@@ -1,0 +1,84 @@
+name: workflows_run-test-suite
+
+on:
+  push:
+  #   branches-ignore:
+  #     - "main"
+
+  # Runs your workflow when activity on a pull request in the workflow's repository
+  # occurs. For example, if no activity types are specified, the workflow runs
+  # when a pull request is opened or reopened
+  # or when the head branch of the pull request is updated.
+  # pull_request:
+  #   branches:
+  #     - main
+  # pull_request_target:
+
+  # Make it possible to run the workflow manually (from GitHub's web UI).
+  workflow_dispatch:
+
+jobs:
+
+  jobs_run-test-suite:
+
+    runs-on: ubuntu-20.04
+
+    outputs:
+      coverage-percentage: ${{ steps.run-tests.outputs.coverage-percentage }}
+
+    steps:
+      - name: Check out repository onto runner
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.3'
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - id: run-tests
+        name: Run tests
+        run: |
+          echo "DJANGO_SECRET_KEY=123" > .env
+
+          # Using the `-m` flag to run this python command
+          # will add the current directory to `sys.path`.
+          # python -m pytest
+          PYTHONPATH=. pytest \
+              --cov=src/ \
+              --cov-report=term-missing \
+              --cov-branch \
+              > line-with-the-TOTAL.txt
+
+          read -r -a arr <<< $(grep TOTAL line-with-the-TOTAL.txt)
+          coverage_percentage=${arr[5]}
+
+          echo "coverage-percentage=${coverage_percentage}" >> $GITHUB_OUTPUT
+  # https://docs.github.com/en/actions/using-jobs/defining-outputs-for-jobs
+
+
+  # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs
+  jobs_report-coverage-by-posting-comment-on-commit:
+
+    runs-on: ubuntu-latest
+
+    needs: jobs_run-test-suite
+
+    steps:
+
+      - id: create-badge-url
+        name: Create badge with (test-)coverage percentage
+        run: |
+          coverage_percentage="${{ needs.jobs_run-test-suite.outputs.coverage-percentage }}"
+          badge_url="![badge-test-coverage](https://img.shields.io/static/v1?label=test-coverage&message=${coverage_percentage}25&color=black)"
+          echo "badge_url=$badge_url" >> $GITHUB_OUTPUT
+
+      # https://github.com/alexanderdamiani/pytester-cov/blame/main/entrypoint.sh
+      - name: Post comment (containing coverage-percentage badge) on commit
+        uses: peter-evans/commit-comment@v3
+        with:
+          body: ${{ steps.create-badge-url.outputs.badge_url }}
