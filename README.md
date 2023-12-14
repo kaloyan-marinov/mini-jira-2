@@ -1,3 +1,5 @@
+![run-test-suite](https://github.com/kaloyan-marinov/mini-jira-2/actions/workflows/run-test-suite.yml/badge.svg)
+
 # Introduction
 
 `MiniJira` is a web application
