@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -85,10 +86,22 @@ WSGI_APPLICATION = "src.mini_jira_2.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
+POSTGRES_USER = os.environ.get("POSTGRES_USER")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+
+if POSTGRES_DB is None and POSTGRES_USER is None and POSTGRES_PASSWORD is None:
+    print("configuration for connecting to a database is missing - aborting...")
+    sys.exit(1)
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": POSTGRES_DB,
+        "USER": POSTGRES_USER,
+        "PASSWORD": POSTGRES_PASSWORD,
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
     }
 }
 

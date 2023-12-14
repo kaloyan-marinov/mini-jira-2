@@ -85,35 +85,133 @@ Run an individual test case:
 # ...
 ```
 
-# Launch a process responsible for serving the web application
+# Launch the project
+
+This section explain how to
+use a container engine (such as Podman, Docker, etc.) to serve the persistence layer,
+but use `localhost` (= the local network interface) to serve the Django application.
 
 ```bash
-# Launch one terminal instance and, in it, start serving the application:
-(venv) $ PYTHONPATH=. python src/manage.py migrate
-(venv) $ ll src/db.sqlite3
+# If the container engine that you wish to use is Podman,
+# executing this command will allow you to simply copy-and-paste
+# each of the subsequent commands that deal with containerization.
+# 
+# This step:
+#  (a) is only applicable if the container engine you wish to use is Podman;
+#  (b) is only a matter of convenience and, as such, is completely optional.
+alias docker=podman
+```
 
+```bash
+# Launch one terminal instance and, in it, start serving the persistence layer:
+docker run \
+    --name container-m-j-2-postgres \
+    --mount type=volume,source=volume-m-j-2-postgres,destination=/var/lib/postgresql/data \
+    --env-file .env \
+    --publish 5432:5432 \
+    postgres:15.1
+```
+
+(
+
+OPTIONALLY, verify that the previous step did start serving a PostgreSQL server:
+
+```bash
+$ docker container exec \
+   -it \
+   container-m-j-2-postgres \
+   /bin/bash
+root@<container-id> psql \
+    --host=localhost \
+    --port=5432 \
+    --username=<the-value-for-POSTGRES_USER-in-the-.env-file> \
+    --password \
+    <the-value-for-POSTGRES_DB-in-the-.env-file>
+
+Password: 
+psql (15.1 (Debian 15.1-1.pgdg110+1))
+Type "help" for help.
+
+<the-value-for-POSTGRES_DB-in-the-.env-file>=# \d
+Did not find any relations.
+```
+
+)
+
+```bash
+# Launch a second terminal instance and, in it, do the following:
+
+# (a) apply the database migrations:
+(venv) $ PYTHONPATH=. python src/manage.py migrate
+
+# (b) optionally, verify that the database migrations were applied successfully:
+(venv) $ docker container exec \
+   -it \
+   container-m-j-2-postgres \
+   /bin/bash
+root@<container-id> psql \
+    --host=localhost \
+    --port=5432 \
+    --username=<the-value-for-POSTGRES_USER-in-the-.env-file> \
+    --password \
+    <the-value-for-POSTGRES_DB-in-the-.env-file>
+
+Password: 
+psql (15.1 (Debian 15.1-1.pgdg110+1))
+Type "help" for help.
+
+<the-value-for-POSTGRES_DB-in-the-.env-file>=# \d
+                        List of relations
+ Schema |               Name                |   Type   |  Owner  
+--------+-----------------------------------+----------+---------
+ public | auth_group                        | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_group_id_seq                 | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_group_permissions            | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_group_permissions_id_seq     | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_permission                   | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_permission_id_seq            | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user                         | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user_groups                  | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user_groups_id_seq           | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user_id_seq                  | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user_user_permissions        | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | auth_user_user_permissions_id_seq | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_admin_log                  | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_admin_log_id_seq           | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_content_type               | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_content_type_id_seq        | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_migrations                 | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_migrations_id_seq          | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | django_session                    | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | tasks_task                        | table    | <the-value-for-POSTGRES_USER-in-the-.env-file>
+ public | tasks_task_id_seq                 | sequence | <the-value-for-POSTGRES_USER-in-the-.env-file>
+(21 rows)
+        
+<the-value-for-POSTGRES_DB-in-the-.env-file>=# \d tasks_task
+                                   Table "public.tasks_task"
+   Column    |          Type          | Collation | Nullable |             Default              
+-------------+------------------------+-----------+----------+----------------------------------
+ id          | bigint                 |           | not null | generated by default as identity
+ category    | character varying(64)  |           | not null | 
+ description | character varying(256) |           | not null | 
+Indexes:
+    "tasks_task_pkey" PRIMARY KEY, btree (id)
+    "tasks_task_category_200000de_like" btree (category varchar_pattern_ops)
+    "tasks_task_category_key" UNIQUE CONSTRAINT, btree (category)
+
+<the-value-for-POSTGRES_DB-in-the-.env-file>=# SELECT * FROM tasks_task;                                                                                                                                                                                             
+ id | category | description 
+----+----------+-------------
+(0 rows)
+```
+
+```bash
+# Launch a third terminal instance and, in it, start serving the application:
 (venv) $ PYTHONPATH=. python src/manage.py runserver
 ```
 
 ```bash
-# Launch a second terminal instance and, in it, inspect the database:
-$ sqlite3 src/db.sqlite3
-
-sqlite> .mode columns
-sqlite> .headers on
-
-sqlite> .tables
-auth_group                  django_admin_log          
-auth_group_permissions      django_content_type       
-auth_permission             django_migrations         
-auth_user                   django_session            
-auth_user_groups            tasks_task                
-auth_user_user_permissions
-
-```
-
-```bash
-# Launch a third terminal instance and, in it, issue requests to the application:
+# Launch a fourth terminal instance and, in it, issue requests to the application:
 
 $ curl \
    --verbose \
