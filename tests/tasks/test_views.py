@@ -65,7 +65,6 @@ import django
 #           https://pytest-django.readthedocs.io/en/latest/database.html#django-db-modify-db-settings
 settings.DATABASES["default"] = {
     "ENGINE": "django.db.backends.sqlite3",
-    # "NAME": settings.BASE_DIR / "db.sqlite3",
 }
 
 django.setup()
