@@ -53,7 +53,7 @@ rootdir: /Users/is4e1pmmt/Documents/repos/mini-jira-2
 plugins: cov-4.1.0, django-4.7.0
 collected 6 items                                                                                                                                                                
 
-tests/tasks/test_views.py ......                                                                                                                                           [100%]
+tests/tasks/test_views.py ......                                                                                                                                   [100%]
 
 ---------- coverage: platform darwin, python 3.8.3-final-0 -----------
 Name                                   Stmts   Miss Branch BrPart  Cover   Missing
@@ -61,7 +61,7 @@ Name                                   Stmts   Miss Branch BrPart  Cover   Missi
 src/manage.py                             12     12      2      0     0%   2-22
 src/mini_jira_2/__init__.py                0      0      0      0   100%
 src/mini_jira_2/asgi.py                    4      4      0      0     0%   10-16
-src/mini_jira_2/settings.py               21      0      0      0   100%
+src/mini_jira_2/settings.py               28      2      2      1    90%   94-95
 src/mini_jira_2/urls.py                    3      0      0      0   100%
 src/mini_jira_2/wsgi.py                    4      4      0      0     0%   10-16
 src/tasks/__init__.py                      0      0      0      0   100%
@@ -74,7 +74,7 @@ src/tasks/tests.py                         1      1      0      0     0%   1
 src/tasks/urls.py                          3      0      0      0   100%
 src/tasks/views.py                        35      1     18      5    89%   27, 37->exit, 67->70, 71->74, 84->exit
 ----------------------------------------------------------------------------------
-TOTAL                                     97     22     20      5    75%
+TOTAL                                    104     24     22      6    75%
 
 
 ============================== 6 passed in 4.06s ===============================

@@ -1,6 +1,7 @@
 import os
 import pytest
 
+from django.conf import settings
 from django.test import Client
 
 # fmt: off
@@ -54,6 +55,18 @@ the code-block that follows this comment.
 # fmt: on
 os.environ["DJANGO_SETTINGS_MODULE"] = "src.mini_jira_2.settings"
 import django
+
+# TODO: (2023/12/15, 09:10)
+#       The following achieves an overriding of the Django application's settings
+#       at runtime (= i.e. when the test suite is executed).
+#       Consider re-factoring the way in which the overriding is achieved;
+#       alternative approaches are hinted at in the following resources:
+#           https://gdevops.gitlab.io/django/tuto/tests/pytest_django/test_database/test_database.html
+#           https://pytest-django.readthedocs.io/en/latest/database.html#django-db-modify-db-settings
+settings.DATABASES["default"] = {
+    "ENGINE": "django.db.backends.sqlite3",
+    # "NAME": settings.BASE_DIR / "db.sqlite3",
+}
 
 django.setup()
 # fmt: on
