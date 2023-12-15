@@ -57,7 +57,7 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "src.mini_jira_2.settings"
 import django
 
 # TODO: (2023/12/15, 09:10)
-#       The following achieves an overriding of the Django application's settings
+#       The following achieves an overriding of the web application's settings
 #       at runtime (= i.e. when the test suite is executed).
 #       Consider re-factoring the way in which the overriding is achieved;
 #       alternative approaches are hinted at in the following resources:

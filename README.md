@@ -91,7 +91,7 @@ Run an individual test case:
 
 This section explain how to
 use a container engine (such as Podman, Docker, etc.) to serve the persistence layer,
-but use `localhost` (= the local network interface) to serve the Django application.
+but use `localhost` (= the local network interface) to serve the web application.
 
 ```bash
 # If the container engine that you wish to use is Podman,
