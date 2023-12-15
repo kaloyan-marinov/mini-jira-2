@@ -93,20 +93,22 @@ This section explain how to
 use a container engine (such as Podman, Docker, etc.) to serve the persistence layer,
 but use `localhost` (= the local network interface) to serve the web application.
 
-```bash
-# If the container engine that you wish to use is Podman,
-# executing this command will allow you to simply copy-and-paste
-# each of the subsequent commands that deal with containerization.
-# 
-# This step:
-#  (a) is only applicable if the container engine you wish to use is Podman;
-#  (b) is only a matter of convenience and, as such, is completely optional.
-alias docker=podman
-```
+(
+
+If the container engine that you wish to use is Docker,
+you "should" be use each of the following commands
+by simply replacing `podman` with `docker` in each command.
+
+The reason for the quotation marks in "shoud" is that
+the commands in question are
+<ins>actively monitored-and-controlled for correctness</ins>
+only with the `podman` executable.
+
+)
 
 ```bash
 # Launch one terminal instance and, in it, start serving the persistence layer:
-docker run \
+podman run \
     --name container-m-j-2-postgres \
     --mount type=volume,source=volume-m-j-2-postgres,destination=/var/lib/postgresql/data \
     --env-file .env \
@@ -119,7 +121,7 @@ docker run \
 OPTIONALLY, verify that the previous step did start serving a PostgreSQL server:
 
 ```bash
-$ docker container exec \
+$ podman container exec \
    -it \
    container-m-j-2-postgres \
    /bin/bash
@@ -147,7 +149,7 @@ Did not find any relations.
 (venv) $ PYTHONPATH=. python src/manage.py migrate
 
 # (b) optionally, verify that the database migrations were applied successfully:
-(venv) $ docker container exec \
+(venv) $ podman container exec \
    -it \
    container-m-j-2-postgres \
    /bin/bash
