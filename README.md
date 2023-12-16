@@ -377,3 +377,16 @@ $ curl \
 # ...
 <no output>
 ```
+
+# How to run a containerized version of the project
+
+```bash
+$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-15-11-48
+```
+
+```bash
+mini-jira-2 $ podman build \
+   --file Containerfile \
+   --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   .
+```
