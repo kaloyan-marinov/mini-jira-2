@@ -389,7 +389,7 @@ $ podman network create network-mini-jira-2
 ```bash
 $ podman volume create volume-mini-jira-2-postgres
 
-$ export DB_ENGINE_HOST=mini-jira-2-database-server ; \
+$ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
    podman run \
       --name container-mini-jira-2-postgres \
       --network network-mini-jira-2 \
@@ -398,8 +398,8 @@ $ export DB_ENGINE_HOST=mini-jira-2-database-server ; \
       --env-file=.env \
       --env 'DB_ENGINE_HOST' \
       --detach \
-      postgres:15.1 ; \
-   unset DB_ENGINE_HOST
+      postgres:15.1 \
+   '
 ```
 
 ```bash
@@ -412,19 +412,17 @@ mini-jira-2 $ podman build \
    --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
    .
 
-$ export DB_ENGINE_HOST=mini-jira-2-database-server ; \
-   sed 's/DB_ENGINE_HOST=[a-zA-Z0-9_]*/DB_ENGINE_HOST=${DB_ENGINE_HOST}/g' .env > .env.temp ; \
+$ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
    podman run \
       --name container-mini-jira-2 \
       --network network-mini-jira-2 \
       --network-alias mini-jira-2-web-application \
-      --env-file .env.temp \
+      --env-file .env \
       --env 'DB_ENGINE_HOST' \
       --publish 8000:5000 \
       --detach \
-      image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} ; \
-   rm .env.temp ; \
-   unset DB_ENGINE_HOST
+      image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   '
 
 # Launch another terminal instance
 # and, in it,
