@@ -3,7 +3,7 @@
 source venv/bin/activate
 
 while true; do
-    PYTHONPATH=. python src/manage.py migrate
+    python src/manage.py migrate
     if [[ "$?" == "0" ]]; then
         break
     fi

@@ -412,20 +412,6 @@ mini-jira-2 $ podman build \
    --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
    .
 
-# $ export DB_ENGINE_HOST=mini-jira-2-database-server && \
-#    sed 's/DB_ENGINE_HOST=[a-zA-Z0-9_]*/DB_ENGINE_HOST=${DB_ENGINE_HOST}/g' .env > .env.temp && \
-#    podman run \
-#       --name container-mini-jira-2 \
-#       --network network-mini-jira-2 \
-#       --network-alias mini-jira-2-web-application \
-#       --rm \
-#       --env-file .env.temp \
-#       --env 'DB_ENGINE_HOST' \
-#       --publish 8000:8000 \
-#       --detach \
-#       image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} && \
-#    rm .env.temp && \
-#    unset DB_ENGINE_HOST
 $ export DB_ENGINE_HOST=mini-jira-2-database-server ; \
    sed 's/DB_ENGINE_HOST=[a-zA-Z0-9_]*/DB_ENGINE_HOST=${DB_ENGINE_HOST}/g' .env > .env.temp ; \
    podman run \
