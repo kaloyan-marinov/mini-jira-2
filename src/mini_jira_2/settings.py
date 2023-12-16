@@ -86,6 +86,8 @@ WSGI_APPLICATION = "src.mini_jira_2.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DB_ENGINE_HOST = os.environ.get("DB_ENGINE_HOST")
+DB_ENGINE_PORT = os.environ.get("DB_ENGINE_PORT")
 POSTGRES_DB = os.environ.get("POSTGRES_DB")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
@@ -97,11 +99,11 @@ if POSTGRES_DB is None and POSTGRES_USER is None and POSTGRES_PASSWORD is None:
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
+        "HOST": DB_ENGINE_HOST,
+        "PORT": DB_ENGINE_PORT,
         "NAME": POSTGRES_DB,
         "USER": POSTGRES_USER,
         "PASSWORD": POSTGRES_PASSWORD,
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
     },
 }
 

@@ -3,7 +3,7 @@
 source venv/bin/activate
 
 while true; do
-    python src/manage.py migrate
+    PYTHONPATH=. python src/manage.py migrate
     if [[ "$?" == "0" ]]; then
         break
     fi
@@ -15,4 +15,4 @@ exec gunicorn \
     -b :5000 \
     --access-logfile - \
     --error-logfile - \
-    microblog:app
+    src.mini_jira_2.wsgi:application
