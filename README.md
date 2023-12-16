@@ -108,9 +108,11 @@ only with the `podman` executable.
 
 ```bash
 # Launch one terminal instance and, in it, start serving the persistence layer:
+podman volume create volume-mini-jira-2-postgres
+
 podman run \
-    --name container-m-j-2-postgres \
-    --mount type=volume,source=volume-m-j-2-postgres,destination=/var/lib/postgresql/data \
+    --name container-mini-jira-2-postgres \
+    --mount type=volume,source=volume-mini-jira-2-postgres,destination=/var/lib/postgresql/data \
     --env-file .env \
     --publish 5432:5432 \
     postgres:15.1
@@ -376,4 +378,59 @@ $ curl \
 < HTTP/1.1 204 No Content
 # ...
 <no output>
+```
+
+# How to run a containerized version of the project
+
+```bash
+$ podman network create network-mini-jira-2
+```
+
+```bash
+$ podman volume create volume-mini-jira-2-postgres
+
+$ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
+   podman run \
+      --name container-mini-jira-2-postgres \
+      --network network-mini-jira-2 \
+      --network-alias ${DB_ENGINE_HOST} \
+      --mount type=volume,source=volume-mini-jira-2-postgres,destination=/var/lib/postgresql/data \
+      --env-file=.env \
+      --env 'DB_ENGINE_HOST' \
+      --detach \
+      postgres:15.1 \
+   '
+```
+
+```bash
+$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-15-11-48
+```
+
+```bash
+mini-jira-2 $ podman build \
+   --file Containerfile \
+   --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   .
+
+$ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
+   podman run \
+      --name container-mini-jira-2 \
+      --network network-mini-jira-2 \
+      --network-alias mini-jira-2-web-application \
+      --env-file .env \
+      --env 'DB_ENGINE_HOST' \
+      --publish 8000:5000 \
+      --detach \
+      image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   '
+
+# Launch another terminal instance
+# and, in it,
+# you may issue the requests that are documented at the end of the previous section.
+
+# Stop running all containers,
+# remove the created volume,
+# and remove the created network
+# by issuing:
+$ ./clean-container-artifacts.sh
 ```
