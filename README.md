@@ -216,167 +216,11 @@ Indexes:
 ```
 
 ```bash
-# Launch a fourth terminal instance and, in it, issue requests to the application:
-
-$ curl \
-   --verbose \
-   localhost:8000/api/tasks \
-   | json_pp
-
-# ...
-< HTTP/1.1 200 OK
-# ...
-{
-   "items" : []
-}
-
-$ curl \
-   --verbose \
-   --request POST \
-   --header "Content-Type: application/json" \
-   --data '{
-      "category": "health"
-   }' \
-   localhost:8000/api/tasks \
-   | json_pp
-
-# ...
-< HTTP/1.1 400 Bad Request
-# ...
-{
-   "error" : "Bad Request",
-   "message" : "The request body has to provide values for each of 'category' and 'description'."
-}
-
-$ curl \
-   --verbose \
-   --request POST \
-   --header "Content-Type: application/json" \
-   --data '{
-      "category": "health",
-      "description": "go to the doctor"
-   }' \
-   localhost:8000/api/tasks \
-   | json_pp
-
-# ...
-< HTTP/1.1 201 Created
-# ...
-{
-   "category" : "health",
-   "description" : "go to the doctor",
-   "id" : 1
-}
-
-
-
-$ curl \
-   --verbose \
-   --request POST \
-   --header "Content-Type: application/json" \
-   --data '{
-      "category": "work",
-      "description": "build a web application using Django"
-   }' \
-   localhost:8000/api/tasks \
-   | json_pp
-
-# ...
-< HTTP/1.1 201 Created
-# ...
-{
-   "category" : "work",
-   "description" : "build a web application using Django",
-   "id" : 2
-}
-
-$ curl localhost:8000/api/tasks \
-   --verbose \
-   | json_pp
-
-# ...
-< HTTP/1.1 200 OK
-# ...
-{
-   "items" : [
-      {
-         "category" : "health",
-         "description" : "go to the doctor",
-         "id" : 1
-      },
-      {
-         "category" : "work",
-         "description" : "build a web application using Django",
-         "id" : 2
-      }
-   ]
-}
-
-
-
-$ curl \
-   --verbose \
-   --request POST \
-   --header "Content-Type: application/json" \
-   --data '{
-      "category": "VACATON",
-      "description": "look up INTRESTING towns in SICLY to VISITT"
-   }' \
-   localhost:8000/api/tasks \
-   | json_pp
-
-# ...
-< HTTP/1.1 201 Created
-# ...
-{
-   "category" : "VACATON",
-   "description" : "look up INTRESTING towns in SICLY to VISITT",
-   "id" : 3
-}
-
-$ curl \
-   --verbose \
-   localhost:8000/api/tasks/3 \
-   | json_pp
-
-# ...
-< HTTP/1.1 200 OK
-# ...
-{
-   "category" : "VACATON",
-   "description" : "look up INTRESTING towns in SICLY to VISITT",
-   "id" : 3
-}
-
-$ curl \
-   --verbose \
-   --request PUT \
-   --header "Content-Type: application/json" \
-   --data '{
-      "category": "vacation",
-      "description": "look up interesting towns in Sicily to visit"
-   }' \
-   localhost:8000/api/tasks/3 \
-   | json_pp
-
-# ...
-< HTTP/1.1 200 OK
-# ...
-{
-   "category" : "vacation",
-   "description" : "look up interesting towns in Sicily to visit",
-   "id" : 3
-}
-
-$ curl \
-   --verbose \
-   --request DELETE \
-   localhost:8000/api/tasks/2
-
-# ...
-< HTTP/1.1 204 No Content
-# ...
-<no output>
+# Launch a fourth terminal instance and, in it, issue requests to the application
+# either by running the utility script:
+$ utility-scripts/populate-db.sh
+# or by copying the commands from that script and executing them
+# one-by-one and in the same order as they appear in inside the script.
 ```
 
 # How to run a containerized version of the project
@@ -425,11 +269,12 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 
 # Launch another terminal instance
 # and, in it,
-# you may issue the requests that are documented at the end of the previous section.
+# you may issue requests to the web application
+# in the way that is described at the end of the previous section.
 
 # Stop running all containers,
 # remove the created volume,
 # and remove the created network
 # by issuing:
-$ ./clean-container-artifacts.sh
+$ utility-scripts/clean-container-artifacts.sh
 ```
