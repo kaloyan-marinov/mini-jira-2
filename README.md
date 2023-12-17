@@ -125,13 +125,12 @@ OPTIONALLY, verify that the previous step did start serving a PostgreSQL server:
 ```bash
 $ podman container exec \
    -it \
-   container-m-j-2-postgres \
+   container-mini-jira-2-postgres \
    /bin/bash
 root@<container-id> psql \
     --host=localhost \
     --port=5432 \
     --username=<the-value-for-POSTGRES_USER-in-the-.env-file> \
-    --password \
     <the-value-for-POSTGRES_DB-in-the-.env-file>
 
 Password: 
@@ -320,8 +319,8 @@ $ curl \
    --request POST \
    --header "Content-Type: application/json" \
    --data '{
-      "category": "vacaton",
-      "description": "look up intresting towns in Sicly to visitt"
+      "category": "VACATON",
+      "description": "look up INTRESTING towns in SICLY to VISITT"
    }' \
    localhost:8000/api/tasks \
    | json_pp
@@ -330,8 +329,8 @@ $ curl \
 < HTTP/1.1 201 Created
 # ...
 {
-   "category" : "vacaton",
-   "description" : "look up intresting towns in Sicly to visitt",
+   "category" : "VACATON",
+   "description" : "look up INTRESTING towns in SICLY to VISITT",
    "id" : 3
 }
 
@@ -344,8 +343,8 @@ $ curl \
 < HTTP/1.1 200 OK
 # ...
 {
-   "category" : "vacaton",
-   "description" : "look up intresting towns in Sicly to visitt",
+   "category" : "VACATON",
+   "description" : "look up INTRESTING towns in SICLY to VISITT",
    "id" : 3
 }
 
@@ -403,7 +402,7 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 ```
 
 ```bash
-$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-15-11-48
+$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-17-09-01
 ```
 
 ```bash
