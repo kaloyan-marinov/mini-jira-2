@@ -12,6 +12,8 @@ http POST \
 
 export SESSION_ID=<tbd>
 
+export CSRF_TOKEN=<tbd>
+
 http \
    localhost:8000/api/tasks \
    cookie:sessionid=${SESSION_ID}
@@ -53,6 +55,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "health",
       "description": "go to the doctor"
@@ -76,6 +80,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "work",
       "description": "build a web application using Django"
@@ -122,6 +128,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "VACATON",
       "description": "look up INTRESTING towns in SICLY to VISITT"
@@ -158,6 +166,8 @@ curl \
    --verbose \
    --request PUT \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "vacation",
       "description": "look up interesting towns in Sicily to visit"

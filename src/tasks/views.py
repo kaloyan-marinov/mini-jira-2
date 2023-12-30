@@ -1,36 +1,10 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth import authenticate, login
 
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 
 from .models import Task
-
-
-@api_view(["POST"])
-def sign_in(request):
-    # username = request.POST["username"]
-    # password = request.POST["password"]
-    username = request.data.get("username")
-    password = request.data.get("password")
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return Response(
-            status=204,
-        )
-    else:
-        # Return an 'invalid login' error message.
-        return Response(
-            data={
-                "error": "Unauthorized",
-                "message": "Your attempt at using BasicAuthentication failed.",
-            },
-            status=401,
-        )
 
 
 @api_view(["GET", "POST"])

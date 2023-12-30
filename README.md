@@ -233,10 +233,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 (InteractiveConsole)
 >>> from django.contrib.auth.models import User
 >>> user = User.objects.create_user(
-...     os.environ.get("USERNAME"),
-...     os.environ.get("EMAIL"),
-...     os.environ.get("PASSWORD"),
-... )
+    os.environ.get("USERNAME"),
+    os.environ.get("EMAIL"),
+    os.environ.get("PASSWORD"),
+)
 >>> exit()
 ```
 
