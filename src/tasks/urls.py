@@ -12,4 +12,9 @@ urlpatterns = [
         views.process_task,
         name="process-task",
     ),
+    path(
+        "sign_in",
+        views.sign_in,
+        name="sign-in",
+    ),
 ]

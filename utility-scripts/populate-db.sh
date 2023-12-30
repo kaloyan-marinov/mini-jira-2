@@ -5,6 +5,17 @@ set -o xtrace
 # if any subsequent(*) commands which fail.
 set -e
 
+http POST \
+   localhost:8000/api/sign_in \
+   username=${USERNAME} \
+   password=${PASSWORD}
+
+export SESSION_ID=<tbd>
+
+http \
+   localhost:8000/api/tasks \
+   cookie:sessionid=${SESSION_ID}
+
 echo ""
 curl \
    --verbose \
