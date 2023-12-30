@@ -74,7 +74,7 @@ from src.tasks.models import Task
 
 
 @pytest.mark.django_db
-def test_process_tasks_1_post():
+def test_process_tasks_1_post(admin_client):
     """
     If the request body contains values for each of 'category' and 'description',
     then a new `Task` should be created successfully.
@@ -84,7 +84,7 @@ def test_process_tasks_1_post():
     client = Client()
 
     # Act.
-    response = client.post(
+    response = admin_client.post(
         "/api/tasks",
         data={
             "category": "health",
@@ -102,7 +102,7 @@ def test_process_tasks_1_post():
 
 
 @pytest.mark.django_db
-def test_process_tasks_2_get():
+def test_process_tasks_2_get(admin_client):
     """
     If no `Task`s have been created,
     then getting all `Task`s should return an empty list.
@@ -112,7 +112,7 @@ def test_process_tasks_2_get():
     client = Client()
 
     # Act.
-    response = client.get("/api/tasks")
+    response = admin_client.get("/api/tasks")
 
     # Assert.
     assert response.status_code == 200
@@ -122,7 +122,7 @@ def test_process_tasks_2_get():
 
 
 @pytest.mark.django_db
-def test_process_tasks_3_get():
+def test_process_tasks_3_get(admin_client):
     """
     If `Task`s have been created,
     then getting all `Task`s should return
@@ -132,7 +132,7 @@ def test_process_tasks_3_get():
     # Arrange.
     client = Client()
 
-    _ = client.post(
+    _ = admin_client.post(
         "/api/tasks",
         data={
             "category": "health",
@@ -140,7 +140,7 @@ def test_process_tasks_3_get():
         },
     )
 
-    _ = client.post(
+    _ = admin_client.post(
         "/api/tasks",
         data={
             "category": "work",
@@ -149,7 +149,7 @@ def test_process_tasks_3_get():
     )
 
     # Act.
-    response = client.get("/api/tasks")
+    response = admin_client.get("/api/tasks")
 
     # Assert.
     assert response.status_code == 200
@@ -170,7 +170,7 @@ def test_process_tasks_3_get():
 
 
 @pytest.mark.django_db
-def test_process_task_1_get():
+def test_process_task_1_get(admin_client):
     """
     Requesting to retrieve an existing `Task`
     should return a representation of that `Task`.
@@ -179,7 +179,7 @@ def test_process_task_1_get():
     # Arrange.
     client = Client()
 
-    _ = client.post(
+    _ = admin_client.post(
         "/api/tasks",
         data={
             "category": "health",
@@ -188,7 +188,7 @@ def test_process_task_1_get():
     )
 
     # Act.
-    response = client.get("/api/tasks/1")
+    response = admin_client.get("/api/tasks/1")
 
     # Assert.
     assert response.status_code == 200
@@ -200,11 +200,11 @@ def test_process_task_1_get():
 
 
 @pytest.mark.django_db
-def test_process_task_2_put():
+def test_process_task_2_put(admin_client):
     # Arrange.
     client = Client()
 
-    _ = client.post(
+    _ = admin_client.post(
         "/api/tasks",
         data={
             "category": "helthh",
@@ -213,7 +213,7 @@ def test_process_task_2_put():
     )
 
     # Act.
-    response = client.put(
+    response = admin_client.put(
         "/api/tasks/1",
         data={
             "category": "health",
@@ -236,11 +236,11 @@ def test_process_task_2_put():
 
 
 @pytest.mark.django_db
-def test_process_task_3_delete():
+def test_process_task_3_delete(admin_client):
     # Arrange.
     client = Client()
 
-    _ = client.post(
+    _ = admin_client.post(
         "/api/tasks",
         data={
             "category": "health",
@@ -249,7 +249,7 @@ def test_process_task_3_delete():
     )
 
     # Act.
-    response = client.delete("/api/tasks/1")
+    response = admin_client.delete("/api/tasks/1")
 
     # Assert.
     assert response.status_code == 204
