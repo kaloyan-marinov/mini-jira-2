@@ -5,14 +5,23 @@ set -o xtrace
 # if any subsequent(*) commands which fail.
 set -e
 
-http POST \
-   localhost:8000/api/sign_in \
-   username=${USERNAME} \
-   password=${PASSWORD}
+TEMP_FILE=response-with-sessionid-and-csrftoken.txt
+
+curl \
+   --trace-ascii ${TEMP_FILE} \
+   --header "Content-Type: application/json" \
+   --data "{
+      \"username\": \"${USERNAME}\",
+      \"password\": \"${PASSWORD}\"
+   }" \
+   localhost:8000/api/sign_in
+
 
 export SESSION_ID=<tbd>
 
 export CSRF_TOKEN=<tbd>
+
+rm ${TEMP_FILE}
 
 http \
    localhost:8000/api/tasks \
@@ -21,6 +30,8 @@ http \
 echo ""
 curl \
    --verbose \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
@@ -101,10 +112,11 @@ curl \
 # }
 
 echo ""
-curl localhost:8000/api/tasks \
+curl \
+   --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   --verbose \
+   localhost:8000/api/tasks \
    | json_pp
 
 # # ...
