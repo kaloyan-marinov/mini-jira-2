@@ -22,6 +22,8 @@ echo ""
 curl \
    --verbose \
    localhost:8000/api/tasks \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    | json_pp
 
 # # ...
@@ -100,6 +102,8 @@ curl \
 
 echo ""
 curl localhost:8000/api/tasks \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --verbose \
    | json_pp
 
@@ -149,6 +153,8 @@ curl \
 echo ""
 curl \
    --verbose \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks/3 \
    | json_pp
 
@@ -188,6 +194,8 @@ echo ""
 curl \
    --verbose \
    --request DELETE \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks/2
 
 # # ...

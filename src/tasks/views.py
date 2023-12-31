@@ -63,7 +63,17 @@ def process_tasks(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@authentication_classes([SessionAuthentication])
 def process_task(request, task_id):
+    if not request.user.is_authenticated:
+        return Response(
+            data={
+                "error": "Unauthorized",
+                "message": "Your attempt at using SessionAuthentication failed.",
+            },
+            status=401,
+        )
+
     t = Task.objects.get(id=task_id)
 
     if request.method == "GET":

@@ -74,7 +74,7 @@ from src.tasks.models import Task
 
 
 @pytest.mark.django_db
-def test_process_tasks_1_post(admin_client):
+def test_process_tasks_1_post():
     """
     If the request body contains values for each of 'category' and 'description',
     then a new `Task` should be created successfully.
@@ -84,7 +84,7 @@ def test_process_tasks_1_post(admin_client):
     client = Client()
 
     # Act.
-    response = admin_client.post(
+    response = client.post(
         "/api/tasks",
         data={
             "category": "health",
