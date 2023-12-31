@@ -24,13 +24,23 @@ line_with_csrf_token=$(grep "Set-Cookie:  csrftoken" $TEMP_FILE)
 if [[ $line_with_csrf_token =~ $regex ]]
 then
    CSRF_TOKEN="${BASH_REMATCH[1]}"
-   echo "identified the CSRF token to be equal to: ${CSRF_TOKEN}"
+   echo "identified the CSRF token to be equal to ${CSRF_TOKEN}"
 else
    echo "$line_with_csrf_token doesn't match" >&2
 fi
 
 
-export SESSION_ID=<tbd>
+# Extract the Session ID,
+# which is contained in the preceding command's output.
+regex="Set-Cookie:  sessionid=([0-9a-zA-Z]+);"
+line_with_session_id=$(grep "Set-Cookie:  sessionid" $TEMP_FILE)
+if [[ $line_with_session_id =~ $regex ]]
+then
+   SESSION_ID="${BASH_REMATCH[1]}"
+   echo "identified the Session ID to be equal to ${SESSION_ID}"
+else
+   echo "$line_with_session_id doesn't match" >&2
+fi
 
 # rm ${TEMP_FILE}
 # 
