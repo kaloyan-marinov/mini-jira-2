@@ -18,6 +18,8 @@ curl \
    }" \
    localhost:8000/api/sign_in
 
+cat ${TEMP_FILE}
+
 # # ...
 # < HTTP/1.1 204 No Content
 # # ...

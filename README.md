@@ -211,19 +211,6 @@ Indexes:
 ```
 
 ```bash
-# Launch a third terminal instance and, in it, start serving the application:
-(venv) $ PYTHONPATH=. python src/manage.py runserver
-```
-
-```bash
-# Launch a fourth terminal instance and, in it, issue requests to the application
-# either by running the utility script:
-$ utility-scripts/populate-db.sh
-# or by copying the commands from that script and executing them
-# one-by-one and in the same order as they appear in inside the script.
-```
-
-```bash
 # Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
 # from the `.env` file.
 (venv) $ PYTHONPATH=. src/manage.py shell
@@ -239,6 +226,19 @@ Type "help", "copyright", "credits" or "license" for more information.
     os.environ.get("PASSWORD"),
 )
 >>> exit()
+```
+
+```bash
+# Launch a third terminal instance and, in it, start serving the application:
+(venv) $ PYTHONPATH=. python src/manage.py runserver
+```
+
+```bash
+# Launch a fourth terminal instance and, in it, issue requests to the application
+# either by running the utility script:
+$ utility-scripts/populate-db.sh
+# or by copying the commands from that script and executing them
+# one-by-one and in the same order as they appear in inside the script.
 ```
 
 # How to run a containerized version of the project
