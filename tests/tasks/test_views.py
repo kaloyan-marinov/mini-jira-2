@@ -109,6 +109,17 @@ def test_process_tasks_1_post():
     csrf_token = response_.cookies["csrftoken"].value
     session_id = response_.cookies["sessionid"].value
 
+    # from django.contrib.sessions.backends.db import SessionStore
+    # from django.contrib.sessions.models import Session
+
+    # client_session = Session.objects.get(
+    #     pk=client.session.session_key,
+    # )
+
+    # client_cookies = client.cookies
+
+    client.logout()
+
     # Act.
     response = client.post(
         "/api/tasks",
@@ -117,9 +128,9 @@ def test_process_tasks_1_post():
             "description": "go to the doctor",
         },
         # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
-        # headers={
-        #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
-        # },
+        headers={
+            "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
+        },
     )
 
     # Assert.
