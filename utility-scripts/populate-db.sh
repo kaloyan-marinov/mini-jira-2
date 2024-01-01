@@ -26,7 +26,10 @@ cat ${TEMP_FILE}
 # <no output>
 # ```
 
-# Extract the CSRF token,
+# Adapt the example from
+# https://stackoverflow.com/questions/1891797/capturing-groups-from-a-grep-regex
+# in order to
+# extract the CSRF token,
 # which is contained in the preceding command's output.
 regex="Set-Cookie:  csrftoken=([0-9a-zA-Z]+);"
 line_with_csrf_token=$(grep "Set-Cookie:  csrftoken" $TEMP_FILE)
@@ -38,7 +41,10 @@ else
    echo "$line_with_csrf_token doesn't match" >&2
 fi
 
-# Extract the Session ID,
+# Adapt the example from
+# https://stackoverflow.com/questions/1891797/capturing-groups-from-a-grep-regex
+# in order to
+# extract the Session ID,
 # which is contained in the preceding command's output.
 regex="Set-Cookie:  sessionid=([0-9a-zA-Z]+);"
 line_with_session_id=$(grep "Set-Cookie:  sessionid" $TEMP_FILE)

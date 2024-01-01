@@ -71,6 +71,7 @@ django.setup()
 # fmt: on
 
 from src.tasks.models import Task
+from django.contrib.auth.models import User
 
 
 @pytest.mark.django_db
@@ -81,7 +82,32 @@ def test_process_tasks_1_post():
     """
 
     # Arrange.
+    username = "test-jd"
+    email = "test-john.doe@protonmai.com"
+    password = "test-123"
+    user = User.objects.create_user(
+        username,
+        email=email,
+        password=password,
+    )
+
     client = Client()
+
+    # Similarly to [this documentation](
+    #   https://docs.djangoproject.com/en/5.0/topics/testing/tools/#django.test.Client.login
+    # ) about `client.login`,
+    # invoking the next statement causes the test `client`
+    # to have all the cookies and session data
+    # required to pass any(?) [login-required checks] that may [be] part of a view [function].
+    response_ = client.post(
+        "/api/sign_in",
+        data={
+            "username": user.username,
+            "password": password,
+        },
+    )
+    csrf_token = response_.cookies["csrftoken"].value
+    session_id = response_.cookies["sessionid"].value
 
     # Act.
     response = client.post(
@@ -90,6 +116,10 @@ def test_process_tasks_1_post():
             "category": "health",
             "description": "go to the doctor",
         },
+        # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
+        # headers={
+        #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
+        # },
     )
 
     # Assert.
