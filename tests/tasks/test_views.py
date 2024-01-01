@@ -118,7 +118,15 @@ def test_process_tasks_1_post():
 
     # client_cookies = client.cookies
 
+    # As per [this](
+    #   https://stackoverflow.com/questions/19616817/testing-django-application-cookies-sessions-and-states
+    # ),
+    # the following statement should not be used in this test:
+    # fmt: off
+    '''
     client.logout()
+    '''
+    # fmt: on
 
     # Act.
     response = client.post(
@@ -127,10 +135,14 @@ def test_process_tasks_1_post():
             "category": "health",
             "description": "go to the doctor",
         },
-        # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
-        headers={
-            "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
-        },
+        # # fmt: off
+        # '''
+        # # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
+        # headers={
+        #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
+        # },
+        # '''
+        # # fmt: on
     )
 
     # Assert.
