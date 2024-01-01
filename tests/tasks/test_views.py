@@ -139,7 +139,7 @@ class Test_1_ProcessTasks(TestBase):
             # '''
             # # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
             # headers={
-            #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
+            #     "Cookie": f"sessionid={self.session_id}; csrftoken={self.csrf_token};",
             # },
             # '''
             # # fmt: on

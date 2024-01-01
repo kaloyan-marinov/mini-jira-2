@@ -7,8 +7,6 @@ from rest_framework.response import Response
 
 @api_view(["POST"])
 def sign_in(request):
-    # username = request.POST["username"]
-    # password = request.POST["password"]
     username = request.data.get("username")
     password = request.data.get("password")
     user = authenticate(request, username=username, password=password)
@@ -18,7 +16,6 @@ def sign_in(request):
             status=204,
         )
     else:
-        # Return an 'invalid login' error message.
         return Response(
             data={
                 "error": "Unauthorized",
