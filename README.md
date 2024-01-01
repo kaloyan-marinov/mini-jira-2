@@ -80,10 +80,17 @@ TOTAL                                    104     24     22      6    75%
 ============================== 6 passed in 4.06s ===============================
 ```
 
+Run a single class of test cases:
+```bash
+(venv) $ PYTHONPATH=. pytest \
+   tests/tasks/test_views.py::Test_1_ProcessTasks
+# ...
+```
+
 Run an individual test case:
 ```bash
 (venv) $ PYTHONPATH=. pytest \
-   tests/tasks/test_views.py::test_process_tasks_1_post
+   tests/tasks/test_views.py::Test_1_ProcessTasks::test_post
 # ...
 ```
 
@@ -211,6 +218,24 @@ Indexes:
 ```
 
 ```bash
+# Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
+# from the `.env` file.
+(venv) $ PYTHONPATH=. python src/manage.py shell
+Python 3.8.3 (v3.8.3:6f8c8320e9, May 13 2020, 16:29:34) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> import os
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user(
+    os.environ.get("USERNAME"),
+    os.environ.get("EMAIL"),
+    os.environ.get("PASSWORD"),
+)
+>>> exit()
+```
+
+```bash
 # Launch a third terminal instance and, in it, start serving the application:
 (venv) $ PYTHONPATH=. python src/manage.py runserver
 ```
@@ -246,7 +271,7 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 ```
 
 ```bash
-$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-17-09-01
+$ export HYPHENATED_YYYY_MM_DD_HH_MM=2024-01-01-10-35
 ```
 
 ```bash
@@ -268,9 +293,32 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
    '
 
 # Launch another terminal instance
-# and, in it,
-# you may issue requests to the web application
-# in the way that is described at the end of the previous section.
+# and, in it:
+# (a) Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
+#     from the `.env` file.
+$ podman container exec \
+   -it \
+   container-mini-jira-2 \
+   /bin/bash
+
+root@<container-id> python src/manage.py shell
+Python 3.8.3 (v3.8.3:6f8c8320e9, May 13 2020, 16:29:34) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> import os
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user(
+    os.environ.get("USERNAME"),
+    os.environ.get("EMAIL"),
+    os.environ.get("PASSWORD"),
+)
+>>> exit()
+```
+
+```bash
+# (b) You may issue requests to the web application
+#     in the way that is described at the end of the previous section.
 
 # Stop running all containers,
 # remove the created volume,
@@ -278,3 +326,22 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 # by issuing:
 $ utility-scripts/clean-container-artifacts.sh
 ```
+
+# Future plans
+
+- make it possible
+  to run the containerized version of the project
+  via Kubernetes
+
+- make it possible
+  to register/create a new `User` by issuing HTTP requests to the web application
+
+- create a Django app called `frontend`
+  that - by utilizing <ins>pure-Django</ins> session-based authentication! -
+  allows users to use their web browsers
+  in order to register, manage their passwords, log in, and log out
+  (
+  whereby the `SessionAuthentication`,
+  which the Django REST Framework is configured to use,
+  will "play nice" with the <ins>pure-Django</ins> session-based authentication
+  )

@@ -1,13 +1,24 @@
 from django.shortcuts import render
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 
 from .models import Task
 
 
 @api_view(["GET", "POST"])
+@authentication_classes([SessionAuthentication])
 def process_tasks(request):
+    if not request.user.is_authenticated:
+        return Response(
+            data={
+                "error": "Unauthorized",
+                "message": "Your attempt at using SessionAuthentication failed.",
+            },
+            status=401,
+        )
+
     if request.method == "POST":
         category = request.data.get("category")
         description = request.data.get("description")
@@ -50,7 +61,17 @@ def process_tasks(request):
 
 
 @api_view(["GET", "PUT", "DELETE"])
+@authentication_classes([SessionAuthentication])
 def process_task(request, task_id):
+    if not request.user.is_authenticated:
+        return Response(
+            data={
+                "error": "Unauthorized",
+                "message": "Your attempt at using SessionAuthentication failed.",
+            },
+            status=401,
+        )
+
     t = Task.objects.get(id=task_id)
 
     if request.method == "GET":

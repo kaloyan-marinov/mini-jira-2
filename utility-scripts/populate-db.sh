@@ -1,13 +1,83 @@
+# Ensure that
+# this script will have access to the `USERNAME` and `PASSWORD` variables
+# from the following file:
+source .env
+
 # Arrange for every command to be printed before it is executed.
 set -o xtrace
 
 # Arrange for this script to exit immediately
-# if any subsequent(*) commands which fail.
+# if any one of the subsequent commands fails.
 set -e
+
+TEMP_FILE=response-with-sessionid-and-csrftoken.txt
+
+curl \
+   --trace-ascii ${TEMP_FILE} \
+   --header "Content-Type: application/json" \
+   --data "{
+      \"username\": \"${USERNAME}\",
+      \"password\": \"${PASSWORD}\"
+   }" \
+   localhost:8000/api/sign_in
+
+cat ${TEMP_FILE}
+
+# # ...
+# < HTTP/1.1 204 No Content
+# # ...
+# <no output>
+# ```
+
+# Adapt the example from
+# https://stackoverflow.com/questions/1891797/capturing-groups-from-a-grep-regex
+# in order to
+# extract the CSRF token,
+# which is contained in the preceding command's output.
+reg_exp_for_csrf_token="csrftoken=([0-9a-zA-Z]+);"
+line_with_csrf_token=$(
+   grep \
+      --extended-regexp \
+      $reg_exp_for_csrf_token \
+      $TEMP_FILE
+)
+if [[ $line_with_csrf_token =~ $reg_exp_for_csrf_token ]]
+then
+   CSRF_TOKEN="${BASH_REMATCH[1]}"
+   echo "identified the CSRF token to be equal to ${CSRF_TOKEN}"
+else
+   echo "no match found in '$line_with_csrf_token' - aborting!" >&2
+   exit 1
+fi
+
+# Adapt the example from
+# https://stackoverflow.com/questions/1891797/capturing-groups-from-a-grep-regex
+# in order to
+# extract the Session ID,
+# which is contained in the preceding command's output.
+reg_exp_for_session_id="sessionid=([0-9a-zA-Z]+);"
+line_with_session_id=$(
+   grep \
+      --extended-regexp \
+      $reg_exp_for_session_id \
+      $TEMP_FILE
+)
+if [[ $line_with_session_id =~ $reg_exp_for_session_id ]]
+then
+   SESSION_ID="${BASH_REMATCH[1]}"
+   echo "identified the Session ID to be equal to ${SESSION_ID}"
+else
+   echo "no match found in '$line_with_session_id' - aborting!" >&2
+   exit 1
+fi
+
+rm ${TEMP_FILE}
 
 echo ""
 curl \
    --verbose \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks \
    | json_pp
 
@@ -23,6 +93,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "health"
    }' \
@@ -42,6 +114,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "health",
       "description": "go to the doctor"
@@ -65,6 +139,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "work",
       "description": "build a web application using Django"
@@ -84,6 +160,8 @@ curl \
 echo ""
 curl localhost:8000/api/tasks \
    --verbose \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    | json_pp
 
 # # ...
@@ -111,6 +189,8 @@ curl \
    --verbose \
    --request POST \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "VACATON",
       "description": "look up INTRESTING towns in SICLY to VISITT"
@@ -130,6 +210,8 @@ curl \
 echo ""
 curl \
    --verbose \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks/3 \
    | json_pp
 
@@ -147,6 +229,8 @@ curl \
    --verbose \
    --request PUT \
    --header "Content-Type: application/json" \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    --data '{
       "category": "vacation",
       "description": "look up interesting towns in Sicily to visit"
@@ -167,6 +251,8 @@ echo ""
 curl \
    --verbose \
    --request DELETE \
+   --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
+   --header "X-CSRFToken: ${CSRF_TOKEN}" \
    localhost:8000/api/tasks/2
 
 # # ...
