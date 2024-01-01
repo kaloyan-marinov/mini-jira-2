@@ -80,10 +80,17 @@ TOTAL                                    104     24     22      6    75%
 ============================== 6 passed in 4.06s ===============================
 ```
 
+Run a single class of test cases:
+```bash
+(venv) $ PYTHONPATH=. pytest \
+   tests/tasks/test_views.py::Test_1_ProcessTasks
+# ...
+```
+
 Run an individual test case:
 ```bash
 (venv) $ PYTHONPATH=. pytest \
-   tests/tasks/test_views.py::test_process_tasks_1_post
+   tests/tasks/test_views.py::Test_1_ProcessTasks::test_post
 # ...
 ```
 

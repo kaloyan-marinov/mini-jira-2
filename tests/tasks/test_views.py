@@ -72,239 +72,225 @@ django.setup()
 
 from src.tasks.models import Task
 from django.contrib.auth.models import User
+import unittest
 
 
-@pytest.mark.django_db
-def test_process_tasks_1_post():
-    """
-    If the request body contains values for each of 'category' and 'description',
-    then a new `Task` should be created successfully.
-    """
+class TestBase(unittest.TestCase):
+    def setUp(self):
+        username = "test-jd"
+        email = "test-john.doe@protonmai.com"
+        password = "test-123"
+        user = User.objects.create_user(
+            username,
+            email=email,
+            password=password,
+        )
 
-    # Arrange.
-    username = "test-jd"
-    email = "test-john.doe@protonmai.com"
-    password = "test-123"
-    user = User.objects.create_user(
-        username,
-        email=email,
-        password=password,
-    )
+        self.client = Client()
 
-    client = Client()
+        # Similarly to [this documentation](
+        #   https://docs.djangoproject.com/en/5.0/topics/testing/tools/#django.test.Client.login
+        # ) about `client.login`,
+        # invoking the next statement causes the test `client`
+        # to have all the cookies and session data
+        # required to pass any(?) [login-required checks] that may [be] part of a view [function].
+        response_ = self.client.post(
+            "/api/sign_in",
+            data={
+                "username": user.username,
+                "password": password,
+            },
+        )
+        self.csrf_token = response_.cookies["csrftoken"].value
+        self.session_id = response_.cookies["sessionid"].value
 
-    # Similarly to [this documentation](
-    #   https://docs.djangoproject.com/en/5.0/topics/testing/tools/#django.test.Client.login
-    # ) about `client.login`,
-    # invoking the next statement causes the test `client`
-    # to have all the cookies and session data
-    # required to pass any(?) [login-required checks] that may [be] part of a view [function].
-    response_ = client.post(
-        "/api/sign_in",
-        data={
-            "username": user.username,
-            "password": password,
-        },
-    )
-    csrf_token = response_.cookies["csrftoken"].value
-    session_id = response_.cookies["sessionid"].value
-
-    # from django.contrib.sessions.backends.db import SessionStore
-    # from django.contrib.sessions.models import Session
-
-    # client_session = Session.objects.get(
-    #     pk=client.session.session_key,
-    # )
-
-    # client_cookies = client.cookies
-
-    # As per [this](
-    #   https://stackoverflow.com/questions/19616817/testing-django-application-cookies-sessions-and-states
-    # ),
-    # the following statement should not be used in this test:
-    # fmt: off
-    '''
-    client.logout()
-    '''
-    # fmt: on
-
-    # Act.
-    response = client.post(
-        "/api/tasks",
-        data={
-            "category": "health",
-            "description": "go to the doctor",
-        },
-        # # fmt: off
-        # '''
-        # # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
-        # headers={
-        #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
-        # },
-        # '''
-        # # fmt: on
-    )
-
-    # Assert.
-    assert response.status_code == 201
-    assert response.json() == {
-        "id": 1,
-        "category": "health",
-        "description": "go to the doctor",
-    }
+    def tearDown(self):
+        pass
 
 
-@pytest.mark.django_db
-def test_process_tasks_2_get(admin_client):
-    """
-    If no `Task`s have been created,
-    then getting all `Task`s should return an empty list.
-    """
+class Test_1_ProcessTasks(TestBase):
+    @pytest.mark.django_db
+    def test_post(self):
+        """
+        If the request body contains values for each of 'category' and 'description',
+        then a new `Task` should be created successfully.
+        """
 
-    # Arrange.
-    client = Client()
+        # Arrange.
 
-    # Act.
-    response = admin_client.get("/api/tasks")
+        # As per [this](
+        #   https://stackoverflow.com/questions/19616817/testing-django-application-cookies-sessions-and-states
+        # ),
+        # the following statement should not be used in this test:
+        # fmt: off
+        '''
+        self.client.logout()
+        '''
+        # fmt: on
 
-    # Assert.
-    assert response.status_code == 200
-    assert response.json() == {
-        "items": [],
-    }
-
-
-@pytest.mark.django_db
-def test_process_tasks_3_get(admin_client):
-    """
-    If `Task`s have been created,
-    then getting all `Task`s should return
-    a list containing representations of all `Task`s.
-    """
-
-    # Arrange.
-    client = Client()
-
-    _ = admin_client.post(
-        "/api/tasks",
-        data={
-            "category": "health",
-            "description": "go to the doctor",
-        },
-    )
-
-    _ = admin_client.post(
-        "/api/tasks",
-        data={
-            "category": "work",
-            "description": "build a web application using Django",
-        },
-    )
-
-    # Act.
-    response = admin_client.get("/api/tasks")
-
-    # Assert.
-    assert response.status_code == 200
-    assert response.json() == {
-        "items": [
-            {
-                "id": 1,
+        # Act.
+        response = self.client.post(
+            "/api/tasks",
+            data={
                 "category": "health",
                 "description": "go to the doctor",
             },
-            {
-                "id": 2,
+            # # fmt: off
+            # '''
+            # # https://stackoverflow.com/questions/26639169/csrf-failed-csrf-token-missing-or-incorrect/26639895#26639895
+            # headers={
+            #     "Cookie": f"sessionid={session_id}; csrftoken={csrf_token};",
+            # },
+            # '''
+            # # fmt: on
+        )
+
+        # Assert.
+        assert response.status_code == 201
+        assert response.json() == {
+            "id": 1,
+            "category": "health",
+            "description": "go to the doctor",
+        }
+
+    @pytest.mark.django_db
+    def test_get(self):
+        """
+        If no `Task`s have been created,
+        then getting all `Task`s should return an empty list.
+        """
+
+        # Act.
+        response = self.client.get("/api/tasks")
+
+        # Assert.
+        assert response.status_code == 200
+        assert response.json() == {
+            "items": [],
+        }
+
+    @pytest.mark.django_db
+    def test_get(self):
+        """
+        If `Task`s have been created,
+        then getting all `Task`s should return
+        a list containing representations of all `Task`s.
+        """
+
+        # Arrange.
+        _ = self.client.post(
+            "/api/tasks",
+            data={
+                "category": "health",
+                "description": "go to the doctor",
+            },
+        )
+
+        _ = self.client.post(
+            "/api/tasks",
+            data={
                 "category": "work",
                 "description": "build a web application using Django",
             },
-        ]
-    }
+        )
+
+        # Act.
+        response = self.client.get("/api/tasks")
+
+        # Assert.
+        assert response.status_code == 200
+        assert response.json() == {
+            "items": [
+                {
+                    "id": 1,
+                    "category": "health",
+                    "description": "go to the doctor",
+                },
+                {
+                    "id": 2,
+                    "category": "work",
+                    "description": "build a web application using Django",
+                },
+            ]
+        }
 
 
-@pytest.mark.django_db
-def test_process_task_1_get(admin_client):
-    """
-    Requesting to retrieve an existing `Task`
-    should return a representation of that `Task`.
-    """
+class Test_2_ProcessTask(TestBase):
+    @pytest.mark.django_db
+    def test_get(self):
+        """
+        Requesting to retrieve an existing `Task`
+        should return a representation of that `Task`.
+        """
 
-    # Arrange.
-    client = Client()
+        # Arrange.
+        _ = self.client.post(
+            "/api/tasks",
+            data={
+                "category": "health",
+                "description": "go to the doctor",
+            },
+        )
 
-    _ = admin_client.post(
-        "/api/tasks",
-        data={
+        # Act.
+        response = self.client.get("/api/tasks/1")
+
+        # Assert.
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": 1,
             "category": "health",
             "description": "go to the doctor",
-        },
-    )
+        }
 
-    # Act.
-    response = admin_client.get("/api/tasks/1")
+    @pytest.mark.django_db
+    def test_put(self):
+        # Arrange.
+        _ = self.client.post(
+            "/api/tasks",
+            data={
+                "category": "helthh",
+                "description": "go to the dctr",
+            },
+        )
 
-    # Assert.
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "category": "health",
-        "description": "go to the doctor",
-    }
+        # Act.
+        response = self.client.put(
+            "/api/tasks/1",
+            data={
+                "category": "health",
+                "description": "go to the doctor",
+            },
+            content_type="application/json",
+        )
 
-
-@pytest.mark.django_db
-def test_process_task_2_put(admin_client):
-    # Arrange.
-    client = Client()
-
-    _ = admin_client.post(
-        "/api/tasks",
-        data={
-            "category": "helthh",
-            "description": "go to the dctr",
-        },
-    )
-
-    # Act.
-    response = admin_client.put(
-        "/api/tasks/1",
-        data={
+        # Assert.
+        assert response.status_code == 200
+        assert response.json() == {
+            "id": 1,
             "category": "health",
             "description": "go to the doctor",
-        },
-        content_type="application/json",
-    )
+        }
 
-    # Assert.
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "category": "health",
-        "description": "go to the doctor",
-    }
+        e = Task.objects.get(id=1)
+        assert e.category == "health"
+        assert e.description == "go to the doctor"
 
-    e = Task.objects.get(id=1)
-    assert e.category == "health"
-    assert e.description == "go to the doctor"
+    @pytest.mark.django_db
+    def test_delete(self):
+        # Arrange.
+        _ = self.client.post(
+            "/api/tasks",
+            data={
+                "category": "health",
+                "description": "go to the doctor",
+            },
+        )
 
+        # Act.
+        response = self.client.delete("/api/tasks/1")
 
-@pytest.mark.django_db
-def test_process_task_3_delete(admin_client):
-    # Arrange.
-    client = Client()
+        # Assert.
+        assert response.status_code == 204
 
-    _ = admin_client.post(
-        "/api/tasks",
-        data={
-            "category": "health",
-            "description": "go to the doctor",
-        },
-    )
-
-    # Act.
-    response = admin_client.delete("/api/tasks/1")
-
-    # Assert.
-    assert response.status_code == 204
-
-    assert Task.objects.count() == 0
+        assert Task.objects.count() == 0
