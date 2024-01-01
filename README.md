@@ -220,7 +220,7 @@ Indexes:
 ```bash
 # Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
 # from the `.env` file.
-(venv) $ PYTHONPATH=. src/manage.py shell
+(venv) $ PYTHONPATH=. python src/manage.py shell
 Python 3.8.3 (v3.8.3:6f8c8320e9, May 13 2020, 16:29:34) 
 [Clang 6.0 (clang-600.0.57)] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
@@ -271,7 +271,7 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 ```
 
 ```bash
-$ export HYPHENATED_YYYY_MM_DD_HH_MM=2023-12-17-09-01
+$ export HYPHENATED_YYYY_MM_DD_HH_MM=2024-01-01-10-35
 ```
 
 ```bash
@@ -293,9 +293,32 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
    '
 
 # Launch another terminal instance
-# and, in it,
-# you may issue requests to the web application
-# in the way that is described at the end of the previous section.
+# and, in it:
+# (a) Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
+#     from the `.env` file.
+$ podman container exec \
+   -it \
+   container-mini-jira-2 \
+   /bin/bash
+
+root@<container-id> python src/manage.py shell
+Python 3.8.3 (v3.8.3:6f8c8320e9, May 13 2020, 16:29:34) 
+[Clang 6.0 (clang-600.0.57)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> import os
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user(
+    os.environ.get("USERNAME"),
+    os.environ.get("EMAIL"),
+    os.environ.get("PASSWORD"),
+)
+>>> exit()
+```
+
+```bash
+# (b) You may issue requests to the web application
+#     in the way that is described at the end of the previous section.
 
 # Stop running all containers,
 # remove the created volume,
