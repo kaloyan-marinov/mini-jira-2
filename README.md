@@ -326,3 +326,22 @@ Type "help", "copyright", "credits" or "license" for more information.
 # by issuing:
 $ utility-scripts/clean-container-artifacts.sh
 ```
+
+# Future plans
+
+- make it possible
+  to run the containerized version of the project
+  via Kubernetes
+
+- make it possible
+  to register/create a new `User` by issuing HTTP requests to the web application
+
+- create a Django app called `frontend`
+  that - by utilizing <ins>pure-Django</ins> session-based authentication! -
+  allows users to use their web browsers
+  in order to register, manage their passwords, log in, and log out
+  (
+  whereby the `SessionAuthentication`,
+  which the Django REST Framework is configured to use,
+  will "play nice" with the <ins>pure-Django</ins> session-based authentication
+  )
