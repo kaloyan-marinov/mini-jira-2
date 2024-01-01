@@ -9,9 +9,7 @@ from .models import Task
 
 @api_view(["GET", "POST"])
 @authentication_classes([SessionAuthentication])
-# @login_required
 def process_tasks(request):
-    # if isinstance(request.user, AnonymousUser):
     if not request.user.is_authenticated:
         return Response(
             data={

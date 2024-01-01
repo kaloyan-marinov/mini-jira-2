@@ -1,10 +1,13 @@
+# Ensure that
+# this script will have access to the `USERNAME` and `PASSWORD` variables
+# from the following file:
 source .env
 
 # Arrange for every command to be printed before it is executed.
 set -o xtrace
 
 # Arrange for this script to exit immediately
-# if any subsequent(*) commands which fail.
+# if any one of the subsequent commands fails.
 set -e
 
 TEMP_FILE=response-with-sessionid-and-csrftoken.txt
