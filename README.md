@@ -327,11 +327,37 @@ Type "help", "copyright", "credits" or "license" for more information.
 $ utility-scripts/clean-container-artifacts.sh
 ```
 
-# Future plans
+# How to run a containerized version of the project via Kubernetes
 
-- make it possible
-  to run the containerized version of the project
-  via Kubernetes
+install `minikube`
+which also installs the `kubectl` command-line tool (as a dependency)
+
+```bash
+$ minikube start --driver docker
+
+# Check the status of the cluster.
+$ minikube status
+
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+```
+
+install the Kubernetes command-line tool, `kubectl`,
+which allows you to run commands against Kubernetes clusters
+
+```bash
+# Display all nodes in the cluster.
+$ kubectl get node
+
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   7m42s   v1.28.3
+```
+
+# Future plans
 
 - make it possible
   to register/create a new `User` by issuing HTTP requests to the web application
