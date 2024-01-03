@@ -1,0 +1,64 @@
+# Kubernetes Deployment + Kubernetes Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+spec:
+  # If you want to scale databases in Kubernetes,
+  # you should use a Kubernetes StatefulSet instead of a Kubernetes Deployment.
+  # To keep things simple, we're going to stick to a Deployment with 1 replica.
+  replicas: 1
+  # This helps Kubernetes know
+  # which Pods belong to which Deployment.
+  selector:
+    matchLabels:
+      app: postgres
+  # The following defines a blueprint for Kubernetes Pods.
+  template:
+    metadata:
+      # The following is required for Pods.
+      # (Labels do not guarantee uniqueness
+      # but connect a Deployment to all Pod replicas.)
+      labels:
+        app: postgres
+    spec:
+      # There can be multiple containers in a pod
+      # but, mostly, one main application per pod.
+      containers:
+      - name: container-mini-jira-2-postgres
+        image: postgres:15.1
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: scram-sha-256
+        - name: POSTGRES_INITDB_ARGS
+          value: --auth-host=scram-sha-256
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  # type: ClusterIP  # is the default `type`.
+  # This helps Kubernetes know
+  # which Pods belong to this Service
+  # (and which ones this Service should forward incoming requests to).
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

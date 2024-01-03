@@ -115,9 +115,9 @@ only with the `podman` executable.
 
 ```bash
 # Launch one terminal instance and, in it, start serving the persistence layer:
-podman volume create volume-mini-jira-2-postgres
+docker volume create volume-mini-jira-2-postgres
 
-podman run \
+docker run \
     --name container-mini-jira-2-postgres \
     --mount type=volume,source=volume-mini-jira-2-postgres,destination=/var/lib/postgresql/data \
     --env-file .env \
@@ -130,7 +130,7 @@ podman run \
 OPTIONALLY, verify that the previous step did start serving a PostgreSQL server:
 
 ```bash
-$ podman container exec \
+$ docker container exec \
    -it \
    container-mini-jira-2-postgres \
    /bin/bash
@@ -157,7 +157,7 @@ Did not find any relations.
 (venv) $ PYTHONPATH=. python src/manage.py migrate
 
 # (b) optionally, verify that the database migrations were applied successfully:
-(venv) $ podman container exec \
+(venv) $ docker container exec \
    -it \
    container-m-j-2-postgres \
    /bin/bash
@@ -251,14 +251,14 @@ $ utility-scripts/populate-db.sh
 # How to run a containerized version of the project
 
 ```bash
-$ podman network create network-mini-jira-2
+$ docker network create network-mini-jira-2
 ```
 
 ```bash
-$ podman volume create volume-mini-jira-2-postgres
+$ docker volume create volume-mini-jira-2-postgres
 
 $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
-   podman run \
+   docker run \
       --name container-mini-jira-2-postgres \
       --network network-mini-jira-2 \
       --network-alias ${DB_ENGINE_HOST} \
@@ -275,13 +275,13 @@ $ export HYPHENATED_YYYY_MM_DD_HH_MM=2024-01-01-10-35
 ```
 
 ```bash
-mini-jira-2 $ podman build \
+mini-jira-2 $ docker build \
    --file Containerfile \
    --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
    .
 
 $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
-   podman run \
+   docker run \
       --name container-mini-jira-2 \
       --network network-mini-jira-2 \
       --network-alias mini-jira-2-web-application \
@@ -296,7 +296,7 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 # and, in it:
 # (a) Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
 #     from the `.env` file.
-$ podman container exec \
+$ docker container exec \
    -it \
    container-mini-jira-2 \
    /bin/bash
@@ -357,7 +357,254 @@ NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   7m42s   v1.28.3
 ```
 
+```bash
+$ echo -n ${POSTGRES_USER} | base64
+
+$ echo -n ${POSTGRES_PASSWORD} | base64
+```
+
+```bash
+$ minikube image ls \
+   --format table
+|-----------------------------------------|---------|---------------|--------|
+|                  Image                  |   Tag   |   Image ID    |  Size  |
+|-----------------------------------------|---------|---------------|--------|
+| registry.k8s.io/kube-scheduler          | v1.28.3 | 6d1b4fd1b182d | 60.1MB |
+| registry.k8s.io/coredns/coredns         | v1.10.1 | ead0a4a53df89 | 53.6MB |
+| registry.k8s.io/kube-apiserver          | v1.28.3 | 5374347291230 | 126MB  |
+| registry.k8s.io/kube-controller-manager | v1.28.3 | 10baa1ca17068 | 122MB  |
+| registry.k8s.io/kube-proxy              | v1.28.3 | bfc896cf80fba | 73.1MB |
+| registry.k8s.io/etcd                    | 3.5.9-0 | 73deb9a3f7025 | 294MB  |
+| docker.io/library/postgres              | 15.1    | ccd94e8b5fd9d | 379MB  |
+| registry.k8s.io/pause                   | 3.9     | e6f1816883972 | 744kB  |
+| gcr.io/k8s-minikube/storage-provisioner | v5      | 6e38f40d628db | 31.5MB |
+|-----------------------------------------|---------|---------------|--------|
+
+$  minikube image build \
+   --file Containerfile \
+   --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   .
+
+$ minikube image ls \
+   --format table
+|-----------------------------------------|------------------|---------------|--------|
+|                  Image                  |       Tag        |   Image ID    |  Size  |
+|-----------------------------------------|------------------|---------------|--------|
+| registry.k8s.io/pause                   | 3.9              | e6f1816883972 | 744kB  |
+| docker.io/library/image-mini-jira-2     | 2024-01-01-10-35 | 7dcd8b78252a4 | 202MB  |
+| registry.k8s.io/kube-apiserver          | v1.28.3          | 5374347291230 | 126MB  |
+| registry.k8s.io/kube-proxy              | v1.28.3          | bfc896cf80fba | 73.1MB |
+| registry.k8s.io/etcd                    | 3.5.9-0          | 73deb9a3f7025 | 294MB  |
+| docker.io/library/postgres              | 15.1             | ccd94e8b5fd9d | 379MB  |
+| registry.k8s.io/coredns/coredns         | v1.10.1          | ead0a4a53df89 | 53.6MB |
+| gcr.io/k8s-minikube/storage-provisioner | v5               | 6e38f40d628db | 31.5MB |
+| registry.k8s.io/kube-scheduler          | v1.28.3          | 6d1b4fd1b182d | 60.1MB |
+| registry.k8s.io/kube-controller-manager | v1.28.3          | 10baa1ca17068 | 122MB  |
+|-----------------------------------------|------------------|---------------|--------|
+```
+
+```bash
+# A quick search for "" on the Internet leads to
+#
+#  (a) https://stackoverflow.com/questions/57167104/how-to-use-local-docker-image-in-kubernetes-via-kubectl
+#  (b) https://dev.to/docker/creating-a-private-local-docker-registry-in-5-minutes-2dnl
+#
+# Based on the information in those resources,
+# a follow-up search for "dockerhub registry:2 image" on the Internet leads to
+#
+#  (c) https://hub.docker.com/_/registry
+#
+#  (d) https://distribution.github.io/distribution/
+#      https://distribution.github.io/distribution/about/
+#      https://distribution.github.io/distribution/about/deploying/
+
+# https://distribution.github.io/distribution/about/deploying/#run-a-local-registry
+$ docker run \
+   --detach \
+   --publish 5000:5000 \
+   --restart=always \
+   --name container-registry \
+   registry:2
+
+# https://distribution.github.io/distribution/about/deploying/#copy-an-image-from-docker-hub-to-your-registry
+# 1. issue the `docker build` command from earlier on in this documentation
+# ...
+# 2. create an additional tag for the existing image
+$ docker tag \
+   image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}  \
+   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
+# 3. push the image to the local registry running at `localhost:5000`:
+#    (instructs docker to contact the registry located at ...)
+$ docker push localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
+$ curl -X GET http://localhost:5000/v2/_catalog | json_pp
+# ...
+{
+   "repositories" : [
+      "image-mini-jira-2"
+   ]
+}
+$ curl -X GET http://localhost:5000/v2/image-mini-jira-2/tags/list | json_pp
+# ...
+{
+   "name" : "image-mini-jira-2",
+   "tags" : [
+      "2024-01-01-10-35"
+   ]
+}
+# 4. remove _both_ locally-cached images
+#    so that, in the next step,
+#    we can test pulling the image from the locally-running registry
+#    (
+#    this step does _not_ remove the image from locally-running registry
+#    )
+$ docker image rm \
+   image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
+   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
+# 5. pull the image from the locally-running registry
+$ docker pull \
+   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
+```
+
+```bash
+$ kubectl apply \
+   --filename=kubernetes/database/postgres-config.yaml
+
+$ kubectl apply \
+   --filename=kubernetes/database/postgres-secret.yaml
+
+$ kubectl apply \
+   --filename=kubernetes/database/postgres.yaml
+
+$ kubectl apply \
+   --filename=kubernetes/application/webapp.yaml
+```
+
+```bash
+$ kubectl get all
+NAME                                       READY   STATUS                       RESTARTS   AGE
+pod/postgres-deployment-67db759cf6-vwzgh   0/1     CreateContainerConfigError   0          2m53s
+pod/webapp-deployment-547ff6bf59-8f59b     0/1     ImagePullBackOff             0          30s
+
+NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP          3h33m
+service/postgres-service   ClusterIP   10.105.35.111   <none>        5432/TCP         4m11s
+service/webapp-service     NodePort    10.96.91.146    <none>        5000:30100/TCP   63s
+
+NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/postgres-deployment   0/1     1            0           2m53s
+deployment.apps/webapp-deployment     0/1     1            0           30s
+
+NAME                                             DESIRED   CURRENT   READY   AGE
+replicaset.apps/postgres-deployment-67db759cf6   1         1         0       2m53s
+replicaset.apps/webapp-deployment-547ff6bf59     1         1         0       30s
+
+$ kubectl get configmap
+NAME               DATA   AGE
+kube-root-ca.crt   1      3h34m
+postgres-config    1      6m4s
+
+$ kubectl get secret
+NAME              TYPE     DATA   AGE
+postgres-secret   Opaque   2      5m37s
+
+
+
+$ kubectl describe service webapp-service
+Name:                     webapp-service
+Namespace:                default
+Labels:                   <none>
+Annotations:              <none>
+Selector:                 app=webapp
+Type:                     NodePort
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.96.91.146
+IPs:                      10.96.91.146
+Port:                     <unset>  5000/TCP
+TargetPort:               5000/TCP
+NodePort:                 <unset>  30100/TCP
+Endpoints:                
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+$ kubectl describe pod webapp-deployment-547ff6bf59-8f59b
+Name:             webapp-deployment-547ff6bf59-8f59b
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Tue, 02 Jan 2024 19:09:53 +0000
+Labels:           app=webapp
+                  pod-template-hash=547ff6bf59
+Annotations:      <none>
+Status:           Pending
+IP:               10.244.0.5
+IPs:
+  IP:           10.244.0.5
+Controlled By:  ReplicaSet/webapp-deployment-547ff6bf59
+Containers:
+  container-mini-jira-2-webapp:
+    Container ID:   
+    Image:          image-mini-jira-2:2024-01-01-10-35
+    Image ID:       
+    Port:           5000/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       ImagePullBackOff
+    Ready:          False
+    Restart Count:  0
+    Environment:
+      POSTGRES_DB:        <set to the key 'postgres-url' of config map 'postgres-config'>   Optional: false
+      POSTGRES_USER:      <set to the key 'postgres-user' in secret 'postgres-secret'>      Optional: false
+      POSTGRES_PASSWORD:  <set to the key 'postgres-password' in secret 'postgres-secret'>  Optional: false
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kg8ds (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             False 
+  ContainersReady   False 
+  PodScheduled      True 
+Volumes:
+  kube-api-access-kg8ds:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+  Normal   Scheduled  5m30s                  default-scheduler  Successfully assigned default/webapp-deployment-547ff6bf59-8f59b to minikube
+  Normal   Pulling    3m47s (x4 over 5m29s)  kubelet            Pulling image "image-mini-jira-2:2024-01-01-10-35"
+  Warning  Failed     3m44s (x4 over 5m26s)  kubelet            Failed to pull image "image-mini-jira-2:2024-01-01-10-35": Error response from daemon: pull access denied for image-mini-jira-2, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+  Warning  Failed     3m44s (x4 over 5m26s)  kubelet            Error: ErrImagePull
+  Warning  Failed     3m33s (x6 over 5m25s)  kubelet            Error: ImagePullBackOff
+  Normal   BackOff    21s (x20 over 5m25s)   kubelet            Back-off pulling image "image-mini-jira-2:2024-01-01-10-35"
+
+
+$ kubectl logs --follow webapp-deployment-547ff6bf59-8f59b
+```
+
+```bash
+$ kubectl delete pods --all
+
+$ kubectl delete services --all
+
+$ kubectl delete deployments --all
+
+$ minikube stop
+```
+
 # Future plans
+
+- figure out how to avoid hardcoding the (`base64`-encoded) values
+  within `kubernetes/database/postgres-secret.yaml`
 
 - make it possible
   to register/create a new `User` by issuing HTTP requests to the web application

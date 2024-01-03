@@ -1,0 +1,68 @@
+# Kubernetes Deployment + Kubernetes Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  labels:
+    app: webapp
+spec:
+  #
+  #
+  #
+  replicas: 1
+  # This helps Kubernetes know
+  # which Pods belong to which Deployment.
+  selector:
+    matchLabels:
+      app: webapp
+  # The following defines a blueprint for Kubernetes Pods.
+  template:
+    metadata:
+      # The following is required for Pods.
+      # (Labels do not guarantee uniqueness
+      # but connect a Deployment to all Pod replicas.)
+      labels:
+        app: webapp
+    spec:
+      # There can be multiple containers in a pod
+      # but, mostly, one main application per pod.
+      containers:
+      - name: container-mini-jira-2-webapp
+        image: image-mini-jira-2:2024-01-01-10-35 
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: postgres-url
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-user
+        - name:
+          name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  type: NodePort
+  # This helps Kubernetes know
+  # which Pods belong to this Service
+  # (and which ones this Service should forward incoming requests to).
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      # The following must be between 30000 and 32767.
+      nodePort: 30100
