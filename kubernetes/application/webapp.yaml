@@ -32,11 +32,32 @@ spec:
         ports:
         - containerPort: 5000
         env:
-        - name: POSTGRES_DB
+        # The first element in the following list is added
+        # on the advice in https://stackoverflow.com/a/62224706 .
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DJANGO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: webapp-secret
+              key: django-secret-key
+        - name: DB_ENGINE_HOST
           valueFrom:
             configMapKeyRef:
               name: postgres-config
-              key: postgres-url
+              key: db-engine-host
+        - name: DB_ENGINE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: db-engine-port
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: postgres-db
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:

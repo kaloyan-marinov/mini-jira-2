@@ -19,7 +19,7 @@ curl \
       \"username\": \"${USERNAME}\",
       \"password\": \"${PASSWORD}\"
    }" \
-   localhost:8000/api/sign_in
+   192.168.49.2:30100/api/sign_in
 
 cat ${TEMP_FILE}
 
@@ -78,7 +78,7 @@ curl \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   localhost:8000/api/tasks \
+   192.168.49.2:30100/api/tasks \
    | json_pp
 
 # # ...
@@ -98,7 +98,7 @@ curl \
    --data '{
       "category": "health"
    }' \
-   localhost:8000/api/tasks \
+   192.168.49.2:30100/api/tasks \
    | json_pp
 
 # # ...
@@ -120,7 +120,7 @@ curl \
       "category": "health",
       "description": "go to the doctor"
    }' \
-   localhost:8000/api/tasks \
+   192.168.49.2:30100/api/tasks \
    | json_pp
 
 # # ...
@@ -145,7 +145,7 @@ curl \
       "category": "work",
       "description": "build a web application using Django"
    }' \
-   localhost:8000/api/tasks \
+   192.168.49.2:30100/api/tasks \
    | json_pp
 
 # # ...
@@ -158,7 +158,7 @@ curl \
 # }
 
 echo ""
-curl localhost:8000/api/tasks \
+curl 192.168.49.2:30100/api/tasks \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
@@ -195,7 +195,7 @@ curl \
       "category": "VACATON",
       "description": "look up INTRESTING towns in SICLY to VISITT"
    }' \
-   localhost:8000/api/tasks \
+   192.168.49.2:30100/api/tasks \
    | json_pp
 
 # # ...
@@ -212,7 +212,7 @@ curl \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   localhost:8000/api/tasks/3 \
+   192.168.49.2:30100/api/tasks/3 \
    | json_pp
 
 # # ...
@@ -235,7 +235,7 @@ curl \
       "category": "vacation",
       "description": "look up interesting towns in Sicily to visit"
    }' \
-   localhost:8000/api/tasks/3 \
+   192.168.49.2:30100/api/tasks/3 \
    | json_pp
 
 # # ...
@@ -253,7 +253,7 @@ curl \
    --request DELETE \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   localhost:8000/api/tasks/2
+   192.168.49.2:30100/api/tasks/2
 
 # # ...
 # < HTTP/1.1 204 No Content

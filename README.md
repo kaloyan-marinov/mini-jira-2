@@ -358,6 +358,8 @@ minikube   Ready    control-plane   7m42s   v1.28.3
 ```
 
 ```bash
+$ echo -n ${POSTGRES_DB} | base64
+
 $ echo -n ${POSTGRES_USER} | base64
 
 $ echo -n ${POSTGRES_PASSWORD} | base64
@@ -380,7 +382,9 @@ $ minikube image ls \
 | gcr.io/k8s-minikube/storage-provisioner | v5      | 6e38f40d628db | 31.5MB |
 |-----------------------------------------|---------|---------------|--------|
 
-$  minikube image build \
+# As per Step 5 in https://www.baeldung.com/docker-local-images-minikube ,
+# build an image inside Minikube.
+$ minikube image build \
    --file Containerfile \
    --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
    .
@@ -476,6 +480,9 @@ $ kubectl apply \
    --filename=kubernetes/database/postgres.yaml
 
 $ kubectl apply \
+   --filename=kubernetes/application/webapp-secret.yaml
+
+$ kubectl apply \
    --filename=kubernetes/application/webapp.yaml
 ```
 
@@ -555,7 +562,7 @@ Containers:
     Ready:          False
     Restart Count:  0
     Environment:
-      POSTGRES_DB:        <set to the key 'postgres-url' of config map 'postgres-config'>   Optional: false
+      POSTGRES_DB:        <set to the key 'db-engine-host' of config map 'postgres-config'>   Optional: false
       POSTGRES_USER:      <set to the key 'postgres-user' in secret 'postgres-secret'>      Optional: false
       POSTGRES_PASSWORD:  <set to the key 'postgres-password' in secret 'postgres-secret'>  Optional: false
     Mounts:
@@ -589,6 +596,18 @@ Events:
 
 
 $ kubectl logs --follow webapp-deployment-547ff6bf59-8f59b
+```
+
+```bash
+$ kubectl exec \
+   webapp-deployment-85c9ddc-7c2tv \
+   --container container-mini-jira-2-webapp \
+   -it \
+   /bin/bash
+
+# Create a `User`.
+
+# Execute the `utility-scripts/populate-db.sh` script.
 ```
 
 ```bash

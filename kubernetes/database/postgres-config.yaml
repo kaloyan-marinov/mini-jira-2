@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: postgres-config
 data:
-  postgres-url: postgres-service
+  db-engine-host: postgres-service
+  db-engine-port: "5432"
