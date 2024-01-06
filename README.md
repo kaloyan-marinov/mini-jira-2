@@ -625,6 +625,9 @@ $ minikube stop
 - figure out how to avoid hardcoding the (`base64`-encoded) values
   within `kubernetes/database/postgres-secret.yaml`
 
+- add a pod running Nginx to the (above-described) Kubernetes setup,
+  and arrange for that Nginx pod to act as a load balancer within the Kubernetes setup
+
 - make it possible
   to register/create a new `User` by issuing HTTP requests to the web application
 
