@@ -115,9 +115,9 @@ only with the `podman` executable.
 
 ```bash
 # Launch one terminal instance and, in it, start serving the persistence layer:
-docker volume create volume-mini-jira-2-postgres
+podman volume create volume-mini-jira-2-postgres
 
-docker run \
+podman run \
     --name container-mini-jira-2-postgres \
     --mount type=volume,source=volume-mini-jira-2-postgres,destination=/var/lib/postgresql/data \
     --env-file .env \
@@ -130,7 +130,7 @@ docker run \
 OPTIONALLY, verify that the previous step did start serving a PostgreSQL server:
 
 ```bash
-$ docker container exec \
+$ podman container exec \
    -it \
    container-mini-jira-2-postgres \
    /bin/bash
@@ -157,7 +157,7 @@ Did not find any relations.
 (venv) $ PYTHONPATH=. python src/manage.py migrate
 
 # (b) optionally, verify that the database migrations were applied successfully:
-(venv) $ docker container exec \
+(venv) $ podman container exec \
    -it \
    container-m-j-2-postgres \
    /bin/bash
@@ -251,14 +251,14 @@ $ utility-scripts/populate-db.sh
 # How to run a containerized version of the project
 
 ```bash
-$ docker network create network-mini-jira-2
+$ podman network create network-mini-jira-2
 ```
 
 ```bash
-$ docker volume create volume-mini-jira-2-postgres
+$ podman volume create volume-mini-jira-2-postgres
 
 $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
-   docker run \
+   podman run \
       --name container-mini-jira-2-postgres \
       --network network-mini-jira-2 \
       --network-alias ${DB_ENGINE_HOST} \
@@ -275,13 +275,13 @@ $ export HYPHENATED_YYYY_MM_DD_HH_MM=2024-01-01-10-35
 ```
 
 ```bash
-mini-jira-2 $ docker build \
+mini-jira-2 $ podman build \
    --file Containerfile \
    --tag image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
    .
 
 $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
-   docker run \
+   podman run \
       --name container-mini-jira-2 \
       --network network-mini-jira-2 \
       --network-alias mini-jira-2-web-application \
@@ -296,7 +296,7 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 # and, in it:
 # (a) Provide the values of `USERNAME`, `EMAIL`, `PASSWORD`
 #     from the `.env` file.
-$ docker container exec \
+$ podman container exec \
    -it \
    container-mini-jira-2 \
    /bin/bash
@@ -591,7 +591,7 @@ $ minikube stop
 
 # Future plans
 
-- figure out how to avoid creating Kubernetes secret components from the command line;
+- figure out how to avoid creating Kubernetes secret( component)s from the command line;
   more concretely, look into how HashiCorp Vault can be taken into use
   (for the purpose of managing sensitive data)
   as part of this project

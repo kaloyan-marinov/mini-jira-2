@@ -1,9 +1,9 @@
-docker container rm -f \
+podman container rm -f \
     container-mini-jira-2-postgres \
     container-mini-jira-2
 
-docker volume prune
+podman volume prune
 
-docker network prune
+podman network prune
 
-docker image prune
+podman image prune
