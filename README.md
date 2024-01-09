@@ -358,14 +358,6 @@ minikube   Ready    control-plane   7m42s   v1.28.3
 ```
 
 ```bash
-$ echo -n ${POSTGRES_DB} | base64
-
-$ echo -n ${POSTGRES_USER} | base64
-
-$ echo -n ${POSTGRES_PASSWORD} | base64
-```
-
-```bash
 $ minikube image ls \
    --format table
 |-----------------------------------------|---------|---------------|--------|
@@ -408,79 +400,23 @@ $ minikube image ls \
 ```
 
 ```bash
-# A quick search for "" on the Internet leads to
-#
-#  (a) https://stackoverflow.com/questions/57167104/how-to-use-local-docker-image-in-kubernetes-via-kubectl
-#  (b) https://dev.to/docker/creating-a-private-local-docker-registry-in-5-minutes-2dnl
-#
-# Based on the information in those resources,
-# a follow-up search for "dockerhub registry:2 image" on the Internet leads to
-#
-#  (c) https://hub.docker.com/_/registry
-#
-#  (d) https://distribution.github.io/distribution/
-#      https://distribution.github.io/distribution/about/
-#      https://distribution.github.io/distribution/about/deploying/
-
-# https://distribution.github.io/distribution/about/deploying/#run-a-local-registry
-$ docker run \
-   --detach \
-   --publish 5000:5000 \
-   --restart=always \
-   --name container-registry \
-   registry:2
-
-# https://distribution.github.io/distribution/about/deploying/#copy-an-image-from-docker-hub-to-your-registry
-# 1. issue the `docker build` command from earlier on in this documentation
-# ...
-# 2. create an additional tag for the existing image
-$ docker tag \
-   image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}  \
-   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
-# 3. push the image to the local registry running at `localhost:5000`:
-#    (instructs docker to contact the registry located at ...)
-$ docker push localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
-$ curl -X GET http://localhost:5000/v2/_catalog | json_pp
-# ...
-{
-   "repositories" : [
-      "image-mini-jira-2"
-   ]
-}
-$ curl -X GET http://localhost:5000/v2/image-mini-jira-2/tags/list | json_pp
-# ...
-{
-   "name" : "image-mini-jira-2",
-   "tags" : [
-      "2024-01-01-10-35"
-   ]
-}
-# 4. remove _both_ locally-cached images
-#    so that, in the next step,
-#    we can test pulling the image from the locally-running registry
-#    (
-#    this step does _not_ remove the image from locally-running registry
-#    )
-$ docker image rm \
-   image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM} \
-   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
-# 5. pull the image from the locally-running registry
-$ docker pull \
-   localhost:5000/image-mini-jira-2:${HYPHENATED_YYYY_MM_DD_HH_MM}
-```
-
-```bash
 $ kubectl apply \
    --filename=kubernetes/database/postgres-config.yaml
 
-$ kubectl apply \
-   --filename=kubernetes/database/postgres-secret.yaml
+$ kubectl create secret \
+   generic \
+   postgres-secret \
+   --from-literal=postgres-db=<the-value-for-POSTGRES_DB-in-the-.env-file> \
+   --from-literal=postgres-user=<the-value-for-POSTGRES_USER-in-the-.env-file> \
+   --from-literal=postgres-password=<the-value-for-POSTGRES_PASSWORD-in-the-.env-file>
 
 $ kubectl apply \
    --filename=kubernetes/database/postgres.yaml
 
-$ kubectl apply \
-   --filename=kubernetes/application/webapp-secret.yaml
+$ kubectl create secret \
+   generic \
+   webapp-secret \
+   --from-literal=django-secret-key=<the-value-for-DJANGO_SECRET_KEY-in-the-.env-file>
 
 $ kubectl apply \
    --filename=kubernetes/application/webapp.yaml
@@ -488,31 +424,32 @@ $ kubectl apply \
 
 ```bash
 $ kubectl get all
-NAME                                       READY   STATUS                       RESTARTS   AGE
-pod/postgres-deployment-67db759cf6-vwzgh   0/1     CreateContainerConfigError   0          2m53s
-pod/webapp-deployment-547ff6bf59-8f59b     0/1     ImagePullBackOff             0          30s
+NAME                                       READY   STATUS    RESTARTS   AGE
+pod/postgres-deployment-6db565b94d-2c76d   1/1     Running   0          26s
+pod/webapp-deployment-85c9ddc-d5tnc        1/1     Running   0          4s
 
-NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
-service/kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP          3h33m
-service/postgres-service   ClusterIP   10.105.35.111   <none>        5432/TCP         4m11s
-service/webapp-service     NodePort    10.96.91.146    <none>        5000:30100/TCP   63s
+NAME                       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes         ClusterIP   10.96.0.1      <none>        443/TCP          4m13s
+service/postgres-service   ClusterIP   10.103.6.209   <none>        5432/TCP         26s
+service/webapp-service     NodePort    10.97.27.140   <none>        5000:30100/TCP   4s
 
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/postgres-deployment   0/1     1            0           2m53s
-deployment.apps/webapp-deployment     0/1     1            0           30s
+deployment.apps/postgres-deployment   1/1     1            1           26s
+deployment.apps/webapp-deployment     1/1     1            1           4s
 
 NAME                                             DESIRED   CURRENT   READY   AGE
-replicaset.apps/postgres-deployment-67db759cf6   1         1         0       2m53s
-replicaset.apps/webapp-deployment-547ff6bf59     1         1         0       30s
+replicaset.apps/postgres-deployment-6db565b94d   1         1         1       26s
+replicaset.apps/webapp-deployment-85c9ddc        1         1         1       4s
 
 $ kubectl get configmap
 NAME               DATA   AGE
-kube-root-ca.crt   1      3h34m
-postgres-config    1      6m4s
+kube-root-ca.crt   1      4m5s
+postgres-config    2      2m47s
 
 $ kubectl get secret
 NAME              TYPE     DATA   AGE
-postgres-secret   Opaque   2      5m37s
+postgres-secret   Opaque   3      100s
+webapp-secret     Opaque   1      72s
 
 
 
@@ -525,56 +462,60 @@ Selector:                 app=webapp
 Type:                     NodePort
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.96.91.146
-IPs:                      10.96.91.146
+IP:                       10.97.27.140
+IPs:                      10.97.27.140
 Port:                     <unset>  5000/TCP
 TargetPort:               5000/TCP
 NodePort:                 <unset>  30100/TCP
-Endpoints:                
+Endpoints:                10.244.0.37:5000
 Session Affinity:         None
 External Traffic Policy:  Cluster
 Events:                   <none>
 
-$ kubectl describe pod webapp-deployment-547ff6bf59-8f59b
-Name:             webapp-deployment-547ff6bf59-8f59b
+$ kubectl describe pod webapp-deployment-85c9ddc-d5tnc
+Name:             webapp-deployment-85c9ddc-d5tnc
 Namespace:        default
 Priority:         0
 Service Account:  default
 Node:             minikube/192.168.49.2
-Start Time:       Tue, 02 Jan 2024 19:09:53 +0000
+Start Time:       Tue, 09 Jan 2024 05:40:46 +0000
 Labels:           app=webapp
-                  pod-template-hash=547ff6bf59
+                  pod-template-hash=85c9ddc
 Annotations:      <none>
-Status:           Pending
-IP:               10.244.0.5
+Status:           Running
+IP:               10.244.0.37
 IPs:
-  IP:           10.244.0.5
-Controlled By:  ReplicaSet/webapp-deployment-547ff6bf59
+  IP:           10.244.0.37
+Controlled By:  ReplicaSet/webapp-deployment-85c9ddc
 Containers:
   container-mini-jira-2-webapp:
-    Container ID:   
+    Container ID:   docker://56d8e6d70f3c827ce2d37fdccd5dfd699745a283c85b3da0260de3e687347dda
     Image:          image-mini-jira-2:2024-01-01-10-35
-    Image ID:       
+    Image ID:       docker://sha256:7ccdc014450030fb780859b994d6121c636038932e55d55149c303fc9ca139e2
     Port:           5000/TCP
     Host Port:      0/TCP
-    State:          Waiting
-      Reason:       ImagePullBackOff
-    Ready:          False
+    State:          Running
+      Started:      Tue, 09 Jan 2024 05:40:48 +0000
+    Ready:          True
     Restart Count:  0
     Environment:
-      POSTGRES_DB:        <set to the key 'db-engine-host' of config map 'postgres-config'>   Optional: false
-      POSTGRES_USER:      <set to the key 'postgres-user' in secret 'postgres-secret'>      Optional: false
-      POSTGRES_PASSWORD:  <set to the key 'postgres-password' in secret 'postgres-secret'>  Optional: false
+      HOST_IP:             (v1:status.hostIP)
+      DJANGO_SECRET_KEY:  <set to the key 'django-secret-key' in secret 'webapp-secret'>     Optional: false
+      DB_ENGINE_HOST:     <set to the key 'db-engine-host' of config map 'postgres-config'>  Optional: false
+      DB_ENGINE_PORT:     <set to the key 'db-engine-port' of config map 'postgres-config'>  Optional: false
+      POSTGRES_DB:        <set to the key 'postgres-db' in secret 'postgres-secret'>         Optional: false
+      POSTGRES_USER:      <set to the key 'postgres-user' in secret 'postgres-secret'>       Optional: false
+      POSTGRES_PASSWORD:  <set to the key 'postgres-password' in secret 'postgres-secret'>   Optional: false
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-kg8ds (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-5lg9z (ro)
 Conditions:
   Type              Status
   Initialized       True 
-  Ready             False 
-  ContainersReady   False 
+  Ready             True 
+  ContainersReady   True 
   PodScheduled      True 
 Volumes:
-  kube-api-access-kg8ds:
+  kube-api-access-5lg9z:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
@@ -585,29 +526,53 @@ Node-Selectors:              <none>
 Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                              node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type     Reason     Age                    From               Message
-  ----     ------     ----                   ----               -------
-  Normal   Scheduled  5m30s                  default-scheduler  Successfully assigned default/webapp-deployment-547ff6bf59-8f59b to minikube
-  Normal   Pulling    3m47s (x4 over 5m29s)  kubelet            Pulling image "image-mini-jira-2:2024-01-01-10-35"
-  Warning  Failed     3m44s (x4 over 5m26s)  kubelet            Failed to pull image "image-mini-jira-2:2024-01-01-10-35": Error response from daemon: pull access denied for image-mini-jira-2, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
-  Warning  Failed     3m44s (x4 over 5m26s)  kubelet            Error: ErrImagePull
-  Warning  Failed     3m33s (x6 over 5m25s)  kubelet            Error: ImagePullBackOff
-  Normal   BackOff    21s (x20 over 5m25s)   kubelet            Back-off pulling image "image-mini-jira-2:2024-01-01-10-35"
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  3m19s  default-scheduler  Successfully assigned default/webapp-deployment-85c9ddc-d5tnc to minikube
+  Normal  Pulled     3m19s  kubelet            Container image "image-mini-jira-2:2024-01-01-10-35" already present on machine
+  Normal  Created    3m18s  kubelet            Created container container-mini-jira-2-webapp
+  Normal  Started    3m18s  kubelet            Started container container-mini-jira-2-webapp
 
 
-$ kubectl logs --follow webapp-deployment-547ff6bf59-8f59b
+$ kubectl logs --follow webapp-deployment-85c9ddc-d5tnc
 ```
 
 ```bash
 $ kubectl exec \
-   webapp-deployment-85c9ddc-7c2tv \
+   webapp-deployment-85c9ddc-d5tnc \
    --container container-mini-jira-2-webapp \
    -it \
    /bin/bash
 
 # Create a `User`.
+root@webapp-deployment-85c9ddc-d5tnc:/# python src/manage.py shell
+
+Python 3.8.18 (default, Dec 19 2023, 04:02:50) 
+[GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> import os
+>>> from django.contrib.auth.models import User
+>>> os.environ.get('POSTGRES_EMAIL')
+>>> # Define a variable called `username` and
+    # set it equal to the value of `USERNAME` from the `.env` file.
+>>> # Define a variable called `email` and
+    # set it equal to the value of `EMAIL` from the `.env` file.
+>>> # Define a variable called `password` and
+    # set it equal to the value of `PASSWORD` from the `.env` file.
+>>> user = User.objects.create_user(
+       username,
+       email,
+       password,
+    )
+>>> User.objects.all()
+<QuerySet [<User: u-4-m-j-2>]>
+>>> exit()
+
+root@webapp-deployment-85c9ddc-d5tnc:/# exit
 
 # Execute the `utility-scripts/populate-db.sh` script.
+$ utility-scripts/populate-db.sh
 ```
 
 ```bash
@@ -617,13 +582,19 @@ $ kubectl delete services --all
 
 $ kubectl delete deployments --all
 
+$ kubectl delete secrets --all
+
+$ kubectl delete configmaps --all
+
 $ minikube stop
 ```
 
 # Future plans
 
-- figure out how to avoid hardcoding the (`base64`-encoded) values
-  within `kubernetes/database/postgres-secret.yaml`
+- figure out how to avoid creating Kubernetes secret components from the command line;
+  more concretely, look into how HashiCorp Vault can be taken into use
+  (for the purpose of managing sensitive data)
+  as part of this project
 
 - add a pod running Nginx to the (above-described) Kubernetes setup,
   and arrange for that Nginx pod to act as a load balancer within the Kubernetes setup
