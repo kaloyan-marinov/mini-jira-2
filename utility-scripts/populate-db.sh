@@ -12,6 +12,22 @@ set -e
 
 TEMP_FILE=response-with-sessionid-and-csrftoken.txt
 
+# If the value of the `HOST_IP` environment variable has length zero
+# (i.e. if that environment variable has not been set),
+# provide a default value for that variable.
+if [[ -z "${HOST_IP}" ]]; then
+  HOST_IP="localhost"
+else
+  HOST_IP="${HOST_IP}"
+fi
+
+# Repeat the above, but this time for the `HOST_PORT` environment variable.
+if [[ -z "${HOST_PORT}" ]]; then
+  HOST_PORT="8000"
+else
+  HOST_PORT="${HOST_PORT}"
+fi
+
 curl \
    --trace-ascii ${TEMP_FILE} \
    --header "Content-Type: application/json" \
@@ -19,7 +35,7 @@ curl \
       \"username\": \"${USERNAME}\",
       \"password\": \"${PASSWORD}\"
    }" \
-   192.168.49.2:30100/api/sign_in
+   ${HOST_IP}:${HOST_PORT}/api/sign_in
 
 cat ${TEMP_FILE}
 
@@ -78,7 +94,7 @@ curl \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   192.168.49.2:30100/api/tasks \
+   ${HOST_IP}:${HOST_PORT}/api/tasks \
    | json_pp
 
 # # ...
@@ -98,7 +114,7 @@ curl \
    --data '{
       "category": "health"
    }' \
-   192.168.49.2:30100/api/tasks \
+   ${HOST_IP}:${HOST_PORT}/api/tasks \
    | json_pp
 
 # # ...
@@ -120,7 +136,7 @@ curl \
       "category": "health",
       "description": "go to the doctor"
    }' \
-   192.168.49.2:30100/api/tasks \
+   ${HOST_IP}:${HOST_PORT}/api/tasks \
    | json_pp
 
 # # ...
@@ -145,7 +161,7 @@ curl \
       "category": "work",
       "description": "build a web application using Django"
    }' \
-   192.168.49.2:30100/api/tasks \
+   ${HOST_IP}:${HOST_PORT}/api/tasks \
    | json_pp
 
 # # ...
@@ -158,7 +174,7 @@ curl \
 # }
 
 echo ""
-curl 192.168.49.2:30100/api/tasks \
+curl ${HOST_IP}:${HOST_PORT}/api/tasks \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
@@ -195,7 +211,7 @@ curl \
       "category": "VACATON",
       "description": "look up INTRESTING towns in SICLY to VISITT"
    }' \
-   192.168.49.2:30100/api/tasks \
+   ${HOST_IP}:${HOST_PORT}/api/tasks \
    | json_pp
 
 # # ...
@@ -212,7 +228,7 @@ curl \
    --verbose \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   192.168.49.2:30100/api/tasks/3 \
+   ${HOST_IP}:${HOST_PORT}/api/tasks/3 \
    | json_pp
 
 # # ...
@@ -235,7 +251,7 @@ curl \
       "category": "vacation",
       "description": "look up interesting towns in Sicily to visit"
    }' \
-   192.168.49.2:30100/api/tasks/3 \
+   ${HOST_IP}:${HOST_PORT}/api/tasks/3 \
    | json_pp
 
 # # ...
@@ -253,7 +269,7 @@ curl \
    --request DELETE \
    --header "Cookie: sessionid=${SESSION_ID}; csrftoken=${CSRF_TOKEN}" \
    --header "X-CSRFToken: ${CSRF_TOKEN}" \
-   192.168.49.2:30100/api/tasks/2
+   ${HOST_IP}:${HOST_PORT}/api/tasks/2
 
 # # ...
 # < HTTP/1.1 204 No Content

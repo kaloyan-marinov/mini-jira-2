@@ -329,6 +329,8 @@ $ utility-scripts/clean-container-artifacts.sh
 
 # How to run a containerized version of the project via Kubernetes
 
+install `docker`
+
 install `minikube`
 which also installs the `kubectl` command-line tool (as a dependency)
 
@@ -542,6 +544,7 @@ $ kubectl exec \
    webapp-deployment-85c9ddc-d5tnc \
    --container container-mini-jira-2-webapp \
    -it \
+   -- \
    /bin/bash
 
 # Create a `User`.
@@ -566,13 +569,26 @@ Type "help", "copyright", "credits" or "license" for more information.
        password,
     )
 >>> User.objects.all()
-<QuerySet [<User: u-4-m-j-2>]>
+<QuerySet [<User: <the-value-for-USERNAME-in-the-.env-file>]>
 >>> exit()
 
 root@webapp-deployment-85c9ddc-d5tnc:/# exit
 
+# Determine the IP and port,
+# which the `webapp-deployment-85c9ddc-d5tnc` pod can be accessed at from localhost.
+# (That can be achieved by issuing either one of the commands below.)
+$ kubectl describe pod \
+   webapp-deployment-85c9ddc-d5tnc \
+   | grep 'Node:'
+Node:             minikube/192.168.49.2
+
+$ minikube ip
+192.168.49.2
+
 # Execute the `utility-scripts/populate-db.sh` script.
-$ utility-scripts/populate-db.sh
+$ HOST_IP=$(minikube ip) \
+   HOST_PORT=<the-value-of-the-nodePort-within-webapp.yaml> \
+   utility-scripts/populate-db.sh
 ```
 
 ```bash
