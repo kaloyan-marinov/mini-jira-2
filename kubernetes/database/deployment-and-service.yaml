@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: deployment-database
   labels:
     app: postgres
 spec:
@@ -39,23 +39,23 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-db
+              name: secret-database
+              key: secret-database-db
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-user
+              name: secret-database
+              key: secret-database-user
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-password
+              name: secret-database
+              key: secret-database-password
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: service-database
 spec:
   # type: ClusterIP  # is the default `type`.
   # This helps Kubernetes know

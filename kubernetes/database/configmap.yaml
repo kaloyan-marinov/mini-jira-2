@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-config
+  name: configmap-database
 data:
-  db-engine-host: postgres-service
+  db-engine-host: service-database
   db-engine-port: "5432"

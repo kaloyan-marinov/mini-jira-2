@@ -409,25 +409,25 @@ Create all Kubernetes components
 
 ```bash
 $ kubectl apply \
-   --filename=kubernetes/database/postgres-config.yaml
+   --filename=kubernetes/database/configmap-database.yaml
 
 $ kubectl create secret \
    generic \
-   postgres-secret \
-   --from-literal=postgres-db=<the-value-for-POSTGRES_DB-in-the-.env-file> \
-   --from-literal=postgres-user=<the-value-for-POSTGRES_USER-in-the-.env-file> \
-   --from-literal=postgres-password=<the-value-for-POSTGRES_PASSWORD-in-the-.env-file>
+   secret-database \
+   --from-literal=secret-database-db=<the-value-for-POSTGRES_DB-in-the-.env-file> \
+   --from-literal=secret-database-user=<the-value-for-POSTGRES_USER-in-the-.env-file> \
+   --from-literal=secret-database-password=<the-value-for-POSTGRES_PASSWORD-in-the-.env-file>
 
 $ kubectl apply \
    --filename=kubernetes/database/postgres.yaml
 
 $ kubectl create secret \
    generic \
-   webapp-secret \
+   secret-webapp \
    --from-literal=django-secret-key=<the-value-for-DJANGO_SECRET_KEY-in-the-.env-file>
 
 $ kubectl apply \
-   --filename=kubernetes/application/webapp.yaml
+   --filename=kubernetes/webapp/deployment-and-service.yaml
 ```
 
 List all Kubernetes components that were created in the previous step
@@ -436,36 +436,36 @@ List all Kubernetes components that were created in the previous step
 ```bash
 $ kubectl get all
 NAME                                       READY   STATUS    RESTARTS   AGE
-pod/postgres-deployment-6db565b94d-2c76d   1/1     Running   0          26s
-pod/webapp-deployment-85c9ddc-d5tnc        1/1     Running   0          4s
+pod/deployment-database-6db565b94d-2c76d   1/1     Running   0          26s
+pod/deployment-webapp-85c9ddc-d5tnc        1/1     Running   0          4s
 
 NAME                       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
 service/kubernetes         ClusterIP   10.96.0.1      <none>        443/TCP          4m13s
-service/postgres-service   ClusterIP   10.103.6.209   <none>        5432/TCP         26s
-service/webapp-service     NodePort    10.97.27.140   <none>        5000:30100/TCP   4s
+service/service-database   ClusterIP   10.103.6.209   <none>        5432/TCP         26s
+service/service-webapp     NodePort    10.97.27.140   <none>        5000:30100/TCP   4s
 
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/postgres-deployment   1/1     1            1           26s
-deployment.apps/webapp-deployment     1/1     1            1           4s
+deployment.apps/deployment-database   1/1     1            1           26s
+deployment.apps/deployment-webapp     1/1     1            1           4s
 
 NAME                                             DESIRED   CURRENT   READY   AGE
-replicaset.apps/postgres-deployment-6db565b94d   1         1         1       26s
-replicaset.apps/webapp-deployment-85c9ddc        1         1         1       4s
+replicaset.apps/deployment-database-6db565b94d   1         1         1       26s
+replicaset.apps/deployment-webapp-85c9ddc        1         1         1       4s
 
 $ kubectl get configmap
 NAME               DATA   AGE
 kube-root-ca.crt   1      4m5s
-postgres-config    2      2m47s
+configmap-database    2      2m47s
 
 $ kubectl get secret
 NAME              TYPE     DATA   AGE
-postgres-secret   Opaque   3      100s
-webapp-secret     Opaque   1      72s
+secret-database   Opaque   3      100s
+secret-webapp     Opaque   1      72s
 
 
 
-$ kubectl describe service webapp-service
-Name:                     webapp-service
+$ kubectl describe service service-webapp
+Name:                     service-webapp
 Namespace:                default
 Labels:                   <none>
 Annotations:              <none>
@@ -483,8 +483,8 @@ Session Affinity:         None
 External Traffic Policy:  Cluster
 Events:                   <none>
 
-$ kubectl describe pod webapp-deployment-85c9ddc-d5tnc
-Name:             webapp-deployment-85c9ddc-d5tnc
+$ kubectl describe pod deployment-webapp-85c9ddc-d5tnc
+Name:             deployment-webapp-85c9ddc-d5tnc
 Namespace:        default
 Priority:         0
 Service Account:  default
@@ -497,7 +497,7 @@ Status:           Running
 IP:               10.244.0.37
 IPs:
   IP:           10.244.0.37
-Controlled By:  ReplicaSet/webapp-deployment-85c9ddc
+Controlled By:  ReplicaSet/deployment-webapp-85c9ddc
 Containers:
   container-mini-jira-2-webapp:
     Container ID:   docker://56d8e6d70f3c827ce2d37fdccd5dfd699745a283c85b3da0260de3e687347dda
@@ -511,12 +511,12 @@ Containers:
     Restart Count:  0
     Environment:
       HOST_IP:             (v1:status.hostIP)
-      DJANGO_SECRET_KEY:  <set to the key 'django-secret-key' in secret 'webapp-secret'>     Optional: false
-      DB_ENGINE_HOST:     <set to the key 'db-engine-host' of config map 'postgres-config'>  Optional: false
-      DB_ENGINE_PORT:     <set to the key 'db-engine-port' of config map 'postgres-config'>  Optional: false
-      POSTGRES_DB:        <set to the key 'postgres-db' in secret 'postgres-secret'>         Optional: false
-      POSTGRES_USER:      <set to the key 'postgres-user' in secret 'postgres-secret'>       Optional: false
-      POSTGRES_PASSWORD:  <set to the key 'postgres-password' in secret 'postgres-secret'>   Optional: false
+      DJANGO_SECRET_KEY:  <set to the key 'django-secret-key' in secret 'secret-webapp'>     Optional: false
+      DB_ENGINE_HOST:     <set to the key 'db-engine-host' of config map 'configmap-database'>  Optional: false
+      DB_ENGINE_PORT:     <set to the key 'db-engine-port' of config map 'configmap-database'>  Optional: false
+      POSTGRES_DB:        <set to the key 'secret-database-db' in secret 'secret-database'>         Optional: false
+      POSTGRES_USER:      <set to the key 'secret-database-user' in secret 'secret-database'>       Optional: false
+      POSTGRES_PASSWORD:  <set to the key 'secret-database-password' in secret 'secret-database'>   Optional: false
     Mounts:
       /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-5lg9z (ro)
 Conditions:
@@ -539,13 +539,13 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type    Reason     Age    From               Message
   ----    ------     ----   ----               -------
-  Normal  Scheduled  3m19s  default-scheduler  Successfully assigned default/webapp-deployment-85c9ddc-d5tnc to minikube
+  Normal  Scheduled  3m19s  default-scheduler  Successfully assigned default/deployment-webapp-85c9ddc-d5tnc to minikube
   Normal  Pulled     3m19s  kubelet            Container image "image-mini-jira-2:2024-01-01-10-35" already present on machine
   Normal  Created    3m18s  kubelet            Created container container-mini-jira-2-webapp
   Normal  Started    3m18s  kubelet            Started container container-mini-jira-2-webapp
 
 
-$ kubectl logs --follow webapp-deployment-85c9ddc-d5tnc
+$ kubectl logs --follow deployment-webapp-85c9ddc-d5tnc
 ```
 
 Create a user in the `auth_user` table in the database
@@ -553,13 +553,13 @@ Create a user in the `auth_user` table in the database
 
 ```bash
 $ kubectl exec \
-   webapp-deployment-85c9ddc-d5tnc \
+   deployment-webapp-85c9ddc-d5tnc \
    --container container-mini-jira-2-webapp \
    -it \
    -- \
    /bin/bash
 
-root@webapp-deployment-85c9ddc-d5tnc:/# python src/manage.py shell
+root@deployment-webapp-85c9ddc-d5tnc:/# python src/manage.py shell
 
 Python 3.8.18 (default, Dec 19 2023, 04:02:50) 
 [GCC 12.2.0] on linux
@@ -582,17 +582,17 @@ Type "help", "copyright", "credits" or "license" for more information.
 <QuerySet [<User: <the-value-for-USERNAME-in-the-.env-file>]>
 >>> exit()
 
-root@webapp-deployment-85c9ddc-d5tnc:/# exit
+root@deployment-webapp-85c9ddc-d5tnc:/# exit
 ```
 
 Execute the `utility-scripts/populate-db.sh` script:
 
 ```bash
 # Determine the IP and port,
-# which the `webapp-deployment-85c9ddc-d5tnc` pod can be accessed at from localhost.
+# which the `deployment-webapp-85c9ddc-d5tnc` pod can be accessed at from localhost.
 # (That can be achieved by issuing either one of the commands below.)
 $ kubectl describe pod \
-   webapp-deployment-85c9ddc-d5tnc \
+   deployment-webapp-85c9ddc-d5tnc \
    | grep 'Node:'
 Node:             minikube/192.168.49.2
 
@@ -600,8 +600,8 @@ $ minikube ip
 192.168.49.2
 
 # Note that the value, which should be assigned to `HOST_PORT`, can be obtained
-# either by issuing `grep 'nodePort:' kubernetes/application/webapp.yaml`
-# or by issuing `kubectl get services | grep webapp-service`.
+# either by issuing `grep 'nodePort:' kubernetes/webapp/deployment-and-service.yaml`
+# or by issuing `kubectl get services | grep service-webapp`.
 $ HOST_IP=$(minikube ip) \
    HOST_PORT=<the-value-of-the-nodePort-within-webapp.yaml> \
    utility-scripts/populate-db.sh
@@ -624,8 +624,6 @@ $ minikube stop
 ```
 
 # Future plans
-
-- rename the Kubernetes manifest files
 
 - figure out how to avoid creating Kubernetes secret( component)s from the command line;
   more concretely, look into how HashiCorp Vault can be taken into use

@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: deployment-webapp
   labels:
     app: webapp
 spec:
@@ -41,38 +41,38 @@ spec:
         - name: DJANGO_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: webapp-secret
+              name: secret-webapp
               key: django-secret-key
         - name: DB_ENGINE_HOST
           valueFrom:
             configMapKeyRef:
-              name: postgres-config
+              name: configmap-database
               key: db-engine-host
         - name: DB_ENGINE_PORT
           valueFrom:
             configMapKeyRef:
-              name: postgres-config
+              name: configmap-database
               key: db-engine-port
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-db
+              name: secret-database
+              key: secret-database-db
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-user
+              name: secret-database
+              key: secret-database-user
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
-              key: postgres-password
+              name: secret-database
+              key: secret-database-password
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-service
+  name: service-webapp
 spec:
   type: NodePort
   # This helps Kubernetes know
