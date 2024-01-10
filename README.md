@@ -165,7 +165,6 @@ root@<container-id> psql \
     --host=localhost \
     --port=5432 \
     --username=<the-value-for-POSTGRES_USER-in-the-.env-file> \
-    --password \
     <the-value-for-POSTGRES_DB-in-the-.env-file>
 
 Password: 
@@ -243,7 +242,9 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```bash
 # Launch a fourth terminal instance and, in it, issue requests to the application
 # either by running the utility script:
-$ utility-scripts/populate-db.sh
+$ HOST_IP=localhost \
+   HOST_PORT=8000 \
+   utility-scripts/populate-db.sh
 # or by copying the commands from that script and executing them
 # one-by-one and in the same order as they appear in inside the script.
 ```
@@ -317,8 +318,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```
 
 ```bash
-# (b) You may issue requests to the web application
-#     in the way that is described at the end of the previous section.
+# (b) Issue requests to the web application.
+$ HOST_IP=localhost \
+   HOST_PORT=8000 \
+   utility-scripts/populate-db.sh
 
 # Stop running all containers,
 # remove the created volume,
@@ -556,7 +559,6 @@ Type "help", "copyright", "credits" or "license" for more information.
 (InteractiveConsole)
 >>> import os
 >>> from django.contrib.auth.models import User
->>> os.environ.get('POSTGRES_EMAIL')
 >>> # Define a variable called `username` and
     # set it equal to the value of `USERNAME` from the `.env` file.
 >>> # Define a variable called `email` and
@@ -574,6 +576,9 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 root@webapp-deployment-85c9ddc-d5tnc:/# exit
 
+# TODO: (2024/01/09, 07:53:01)
+#        clean up the comments that follow
+
 # Determine the IP and port,
 # which the `webapp-deployment-85c9ddc-d5tnc` pod can be accessed at from localhost.
 # (That can be achieved by issuing either one of the commands below.)
@@ -586,6 +591,9 @@ $ minikube ip
 192.168.49.2
 
 # Execute the `utility-scripts/populate-db.sh` script.
+# (Note that the value, which should be assigned to `HOST_PORT`, can be obtained
+# either by issuing `grep 'nodePort:' kubernetes/application/webapp.yaml`
+# or by issuing `kubectl get services | grep webapp-service`.)
 $ HOST_IP=$(minikube ip) \
    HOST_PORT=<the-value-of-the-nodePort-within-webapp.yaml> \
    utility-scripts/populate-db.sh
