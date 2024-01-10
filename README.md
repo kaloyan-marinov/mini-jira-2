@@ -404,6 +404,9 @@ $ minikube image ls \
 |-----------------------------------------|------------------|---------------|--------|
 ```
 
+Create all Kubernetes components
+(= a complete containerized version of this project within a Kubernetes cluster):
+
 ```bash
 $ kubectl apply \
    --filename=kubernetes/database/postgres-config.yaml
@@ -426,6 +429,9 @@ $ kubectl create secret \
 $ kubectl apply \
    --filename=kubernetes/application/webapp.yaml
 ```
+
+List all Kubernetes components that were created in the previous step
+(and inspect the (internal) details of some of those components):
 
 ```bash
 $ kubectl get all
@@ -542,6 +548,9 @@ Events:
 $ kubectl logs --follow webapp-deployment-85c9ddc-d5tnc
 ```
 
+Create a user in the `auth_user` table in the database
+(by utilizing the Django model called `User`):
+
 ```bash
 $ kubectl exec \
    webapp-deployment-85c9ddc-d5tnc \
@@ -550,7 +559,6 @@ $ kubectl exec \
    -- \
    /bin/bash
 
-# Create a `User`.
 root@webapp-deployment-85c9ddc-d5tnc:/# python src/manage.py shell
 
 Python 3.8.18 (default, Dec 19 2023, 04:02:50) 
@@ -575,10 +583,11 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> exit()
 
 root@webapp-deployment-85c9ddc-d5tnc:/# exit
+```
 
-# TODO: (2024/01/09, 07:53:01)
-#        clean up the comments that follow
+Execute the `utility-scripts/populate-db.sh` script:
 
+```bash
 # Determine the IP and port,
 # which the `webapp-deployment-85c9ddc-d5tnc` pod can be accessed at from localhost.
 # (That can be achieved by issuing either one of the commands below.)
@@ -590,14 +599,15 @@ Node:             minikube/192.168.49.2
 $ minikube ip
 192.168.49.2
 
-# Execute the `utility-scripts/populate-db.sh` script.
-# (Note that the value, which should be assigned to `HOST_PORT`, can be obtained
+# Note that the value, which should be assigned to `HOST_PORT`, can be obtained
 # either by issuing `grep 'nodePort:' kubernetes/application/webapp.yaml`
-# or by issuing `kubectl get services | grep webapp-service`.)
+# or by issuing `kubectl get services | grep webapp-service`.
 $ HOST_IP=$(minikube ip) \
    HOST_PORT=<the-value-of-the-nodePort-within-webapp.yaml> \
    utility-scripts/populate-db.sh
 ```
+
+Tear down the setup created in this section:
 
 ```bash
 $ kubectl delete pods --all
