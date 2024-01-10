@@ -356,7 +356,7 @@ which allows you to run commands against Kubernetes clusters
 
 ```bash
 # Display all nodes in the cluster.
-$ kubectl get node
+$ kubectl get nodes
 
 NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   7m42s   v1.28.3
@@ -392,7 +392,7 @@ $ minikube image ls \
 |                  Image                  |       Tag        |   Image ID    |  Size  |
 |-----------------------------------------|------------------|---------------|--------|
 | registry.k8s.io/pause                   | 3.9              | e6f1816883972 | 744kB  |
-| docker.io/library/image-mini-jira-2     | 2024-01-01-10-35 | 7dcd8b78252a4 | 202MB  |
+| docker.io/library/image-mini-jira-2     | 2024-01-01-10-35 | 769c3d1e75c4b | 202MB  |
 | registry.k8s.io/kube-apiserver          | v1.28.3          | 5374347291230 | 126MB  |
 | registry.k8s.io/kube-proxy              | v1.28.3          | bfc896cf80fba | 73.1MB |
 | registry.k8s.io/etcd                    | 3.5.9-0          | 73deb9a3f7025 | 294MB  |
@@ -409,7 +409,7 @@ Create all Kubernetes components
 
 ```bash
 $ kubectl apply \
-   --filename=kubernetes/database/configmap-database.yaml
+   --filename=kubernetes/database/configmap.yaml
 
 $ kubectl create secret \
    generic \
@@ -419,7 +419,7 @@ $ kubectl create secret \
    --from-literal=secret-database-password=<the-value-for-POSTGRES_PASSWORD-in-the-.env-file>
 
 $ kubectl apply \
-   --filename=kubernetes/database/postgres.yaml
+   --filename=kubernetes/database/deployment-and-service.yaml
 
 $ kubectl create secret \
    generic \
@@ -430,40 +430,42 @@ $ kubectl apply \
    --filename=kubernetes/webapp/deployment-and-service.yaml
 ```
 
-List all Kubernetes components that were created in the previous step
-(and inspect the (internal) details of some of those components):
+List all Kubernetes components that were created in the previous step:
 
 ```bash
 $ kubectl get all
 NAME                                       READY   STATUS    RESTARTS   AGE
-pod/deployment-database-6db565b94d-2c76d   1/1     Running   0          26s
-pod/deployment-webapp-85c9ddc-d5tnc        1/1     Running   0          4s
+pod/deployment-database-55bd5bc6cc-lhmb4   1/1     Running   0          38s
+pod/deployment-webapp-547cb7bcb-kd4bw      1/1     Running   0          10s
 
-NAME                       TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
-service/kubernetes         ClusterIP   10.96.0.1      <none>        443/TCP          4m13s
-service/service-database   ClusterIP   10.103.6.209   <none>        5432/TCP         26s
-service/service-webapp     NodePort    10.97.27.140   <none>        5000:30100/TCP   4s
+NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/kubernetes         ClusterIP   10.96.0.1       <none>        443/TCP          13m
+service/service-database   ClusterIP   10.104.184.4    <none>        5432/TCP         39s
+service/service-webapp     NodePort    10.109.59.131   <none>        5000:30100/TCP   10s
 
 NAME                                  READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/deployment-database   1/1     1            1           26s
-deployment.apps/deployment-webapp     1/1     1            1           4s
+deployment.apps/deployment-database   1/1     1            1           39s
+deployment.apps/deployment-webapp     1/1     1            1           10s
 
 NAME                                             DESIRED   CURRENT   READY   AGE
-replicaset.apps/deployment-database-6db565b94d   1         1         1       26s
-replicaset.apps/deployment-webapp-85c9ddc        1         1         1       4s
+replicaset.apps/deployment-database-55bd5bc6cc   1         1         1       39s
+replicaset.apps/deployment-webapp-547cb7bcb      1         1         1       10s
 
-$ kubectl get configmap
-NAME               DATA   AGE
-kube-root-ca.crt   1      4m5s
-configmap-database    2      2m47s
+$ kubectl get configmaps
+NAME                 DATA   AGE
+configmap-database   2      3m41s
+kube-root-ca.crt     1      14m
 
-$ kubectl get secret
+$ kubectl get secrets
 NAME              TYPE     DATA   AGE
-secret-database   Opaque   3      100s
-secret-webapp     Opaque   1      72s
+secret-database   Opaque   3      2m39s
+secret-webapp     Opaque   1      105s
+```
 
 
+Inspect the (internal) details of some of the Kubernetes components:
 
+```bash
 $ kubectl describe service service-webapp
 Name:                     service-webapp
 Namespace:                default
@@ -473,52 +475,52 @@ Selector:                 app=webapp
 Type:                     NodePort
 IP Family Policy:         SingleStack
 IP Families:              IPv4
-IP:                       10.97.27.140
-IPs:                      10.97.27.140
+IP:                       10.109.59.131
+IPs:                      10.109.59.131
 Port:                     <unset>  5000/TCP
 TargetPort:               5000/TCP
 NodePort:                 <unset>  30100/TCP
-Endpoints:                10.244.0.37:5000
+Endpoints:                10.244.0.11:5000
 Session Affinity:         None
 External Traffic Policy:  Cluster
 Events:                   <none>
 
-$ kubectl describe pod deployment-webapp-85c9ddc-d5tnc
-Name:             deployment-webapp-85c9ddc-d5tnc
+$ kubectl describe pod deployment-webapp-547cb7bcb-kd4bw
+Name:             deployment-webapp-547cb7bcb-kd4bw
 Namespace:        default
 Priority:         0
 Service Account:  default
 Node:             minikube/192.168.49.2
-Start Time:       Tue, 09 Jan 2024 05:40:46 +0000
+Start Time:       Wed, 10 Jan 2024 06:44:38 +0000
 Labels:           app=webapp
-                  pod-template-hash=85c9ddc
+                  pod-template-hash=547cb7bcb
 Annotations:      <none>
 Status:           Running
-IP:               10.244.0.37
+IP:               10.244.0.11
 IPs:
-  IP:           10.244.0.37
-Controlled By:  ReplicaSet/deployment-webapp-85c9ddc
+  IP:           10.244.0.11
+Controlled By:  ReplicaSet/deployment-webapp-547cb7bcb
 Containers:
   container-mini-jira-2-webapp:
-    Container ID:   docker://56d8e6d70f3c827ce2d37fdccd5dfd699745a283c85b3da0260de3e687347dda
+    Container ID:   docker://4bcaad5e26cc7c815a0e6cbd33d3bf004b940a867567a5378fa6d8c59bcebe31
     Image:          image-mini-jira-2:2024-01-01-10-35
-    Image ID:       docker://sha256:7ccdc014450030fb780859b994d6121c636038932e55d55149c303fc9ca139e2
+    Image ID:       docker://sha256:769c3d1e75c4be13fd9f4c86253327970863cf7270fb56966f4112ca26cbb239
     Port:           5000/TCP
     Host Port:      0/TCP
     State:          Running
-      Started:      Tue, 09 Jan 2024 05:40:48 +0000
+      Started:      Wed, 10 Jan 2024 06:44:39 +0000
     Ready:          True
     Restart Count:  0
     Environment:
       HOST_IP:             (v1:status.hostIP)
-      DJANGO_SECRET_KEY:  <set to the key 'django-secret-key' in secret 'secret-webapp'>     Optional: false
-      DB_ENGINE_HOST:     <set to the key 'db-engine-host' of config map 'configmap-database'>  Optional: false
-      DB_ENGINE_PORT:     <set to the key 'db-engine-port' of config map 'configmap-database'>  Optional: false
-      POSTGRES_DB:        <set to the key 'secret-database-db' in secret 'secret-database'>         Optional: false
-      POSTGRES_USER:      <set to the key 'secret-database-user' in secret 'secret-database'>       Optional: false
-      POSTGRES_PASSWORD:  <set to the key 'secret-database-password' in secret 'secret-database'>   Optional: false
+      DJANGO_SECRET_KEY:  <set to the key 'django-secret-key' in secret 'secret-webapp'>           Optional: false
+      DB_ENGINE_HOST:     <set to the key 'db-engine-host' of config map 'configmap-database'>     Optional: false
+      DB_ENGINE_PORT:     <set to the key 'db-engine-port' of config map 'configmap-database'>     Optional: false
+      POSTGRES_DB:        <set to the key 'secret-database-db' in secret 'secret-database'>        Optional: false
+      POSTGRES_USER:      <set to the key 'secret-database-user' in secret 'secret-database'>      Optional: false
+      POSTGRES_PASSWORD:  <set to the key 'secret-database-password' in secret 'secret-database'>  Optional: false
     Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-5lg9z (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-crpjg (ro)
 Conditions:
   Type              Status
   Initialized       True 
@@ -526,7 +528,7 @@ Conditions:
   ContainersReady   True 
   PodScheduled      True 
 Volumes:
-  kube-api-access-5lg9z:
+  kube-api-access-crpjg:
     Type:                    Projected (a volume that contains injected data from multiple sources)
     TokenExpirationSeconds:  3607
     ConfigMapName:           kube-root-ca.crt
@@ -539,13 +541,18 @@ Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists fo
 Events:
   Type    Reason     Age    From               Message
   ----    ------     ----   ----               -------
-  Normal  Scheduled  3m19s  default-scheduler  Successfully assigned default/deployment-webapp-85c9ddc-d5tnc to minikube
-  Normal  Pulled     3m19s  kubelet            Container image "image-mini-jira-2:2024-01-01-10-35" already present on machine
-  Normal  Created    3m18s  kubelet            Created container container-mini-jira-2-webapp
-  Normal  Started    3m18s  kubelet            Started container container-mini-jira-2-webapp
+  Normal  Scheduled  3m25s  default-scheduler  Successfully assigned default/deployment-webapp-547cb7bcb-kd4bw to minikube
+  Normal  Pulled     3m25s  kubelet            Container image "image-mini-jira-2:2024-01-01-10-35" already present on machine
+  Normal  Created    3m25s  kubelet            Created container container-mini-jira-2-webapp
+  Normal  Started    3m25s  kubelet            Started container container-mini-jira-2-webapp
+```
 
 
-$ kubectl logs --follow deployment-webapp-85c9ddc-d5tnc
+
+(Recall that a Kubernetes Deployment is a blueprint for a Kubernetes Pod.)
+View/Stream the logs of the Kubernetes pod for the `kubernetes/webapp/`:
+```
+$ kubectl logs --follow deployment-webapp-547cb7bcb-kd4bw
 ```
 
 Create a user in the `auth_user` table in the database
@@ -553,13 +560,13 @@ Create a user in the `auth_user` table in the database
 
 ```bash
 $ kubectl exec \
-   deployment-webapp-85c9ddc-d5tnc \
+   deployment-webapp-547cb7bcb-kd4bw \
    --container container-mini-jira-2-webapp \
    -it \
    -- \
    /bin/bash
 
-root@deployment-webapp-85c9ddc-d5tnc:/# python src/manage.py shell
+root@deployment-webapp-547cb7bcb-kd4bw:/# python src/manage.py shell
 
 Python 3.8.18 (default, Dec 19 2023, 04:02:50) 
 [GCC 12.2.0] on linux
@@ -582,17 +589,18 @@ Type "help", "copyright", "credits" or "license" for more information.
 <QuerySet [<User: <the-value-for-USERNAME-in-the-.env-file>]>
 >>> exit()
 
-root@deployment-webapp-85c9ddc-d5tnc:/# exit
+root@deployment-webapp-547cb7bcb-kd4bw:/# exit
 ```
 
 Execute the `utility-scripts/populate-db.sh` script:
 
 ```bash
 # Determine the IP and port,
-# which the `deployment-webapp-85c9ddc-d5tnc` pod can be accessed at from localhost.
+# which the `deployment-webapp-547cb7bcb-kd4bw` pod can be accessed at
+# from `localhost`.
 # (That can be achieved by issuing either one of the commands below.)
 $ kubectl describe pod \
-   deployment-webapp-85c9ddc-d5tnc \
+   deployment-webapp-547cb7bcb-kd4bw \
    | grep 'Node:'
 Node:             minikube/192.168.49.2
 
@@ -632,6 +640,12 @@ $ minikube stop
 
 - add a pod running Nginx to the (above-described) Kubernetes setup,
   and arrange for that Nginx pod to act as a load balancer within the Kubernetes setup
+
+- currently, when the project is deployed via Kubernetes,
+  running the database is achieved
+  via the `kubernetes/database/deployment-and-service.yaml` manifest/file;
+  figure out a more reliable way of running the database
+  when the project is deployed via Kubernetes
 
 - make it possible
   to register/create a new `User` by issuing HTTP requests to the web application
