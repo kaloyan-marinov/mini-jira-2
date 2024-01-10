@@ -625,6 +625,8 @@ $ minikube stop
 
 # Future plans
 
+- rename the Kubernetes manifest files
+
 - figure out how to avoid creating Kubernetes secret( component)s from the command line;
   more concretely, look into how HashiCorp Vault can be taken into use
   (for the purpose of managing sensitive data)
@@ -635,6 +637,11 @@ $ minikube stop
 
 - make it possible
   to register/create a new `User` by issuing HTTP requests to the web application
+
+- split the `src.tasks.models.Task` model into a `Task` model and a `Category` model,
+  with `Task.category_id` being a foreign key to `Category.id`;
+  it should become possible to create multiple `Task`s
+  that are associated with the same `Category`
 
 - create a Django app called `frontend`
   that - by utilizing <ins>pure-Django</ins> session-based authentication! -
