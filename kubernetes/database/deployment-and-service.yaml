@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: deployment-database
   labels:
-    app: postgres
+    app: app-database
 spec:
   # If you want to scale databases in Kubernetes,
   # you should use a Kubernetes StatefulSet instead of a Kubernetes Deployment.
@@ -14,7 +14,7 @@ spec:
   # which Pods belong to which Deployment.
   selector:
     matchLabels:
-      app: postgres
+      app: app-database
   # The following defines a blueprint for Kubernetes Pods.
   template:
     metadata:
@@ -22,7 +22,7 @@ spec:
       # (Labels do not guarantee uniqueness
       # but connect a Deployment to all Pod replicas.)
       labels:
-        app: postgres
+        app: app-database
     spec:
       # There can be multiple containers in a pod
       # but, mostly, one main application per pod.
@@ -62,7 +62,7 @@ spec:
   # which Pods belong to this Service
   # (and which ones this Service should forward incoming requests to).
   selector:
-    app: postgres
+    app: app-database
   ports:
     - protocol: TCP
       port: 5432
