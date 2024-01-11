@@ -11,16 +11,35 @@ spec:
   #
   replicas: 1
   # This helps Kubernetes know
-  # which Pods belong to which Deployment.
+  # which Pod( replica)s belong to the currently-being-configured Deployment.
   selector:
     matchLabels:
       app: app-webapp
   # The following defines a blueprint for Kubernetes Pods.
+  # (
+  # In other words (and for the sake of emphasizing the point):
+  # Everything within the next stanza/section constitutes
+  # a configuration of a Kubernetes Pod,
+  # with that configuration/stanza/section residing
+  # within the configuration of the (currently-being-configured) Kubernetes Deployment.
+  # )
   template:
     metadata:
       # The following is required for Pods.
-      # (Labels do not guarantee uniqueness
-      # but connect a Deployment to all Pod replicas.)
+      # (
+      # When there are multiple replicas of the same Pod,
+      # each Pod will be assigned a unique name (by Kubernetes).
+      # (Utilizing) A `labels:` stanza makes it possible to
+      # identify all Pod replicas of the same (software) application.
+      # Labels do not guarantee uniqueness
+      # but establish an association between a Deployment and to all its Pod replicas.
+      # )
+      #
+      # (
+      # For other components (like Deployment(?), ConfigMap, etc.),
+      # the `labels:` stanza is optional,
+      # but it is good practice to utilize it.
+      # )
       labels:
         app: app-webapp
     spec:
@@ -76,12 +95,10 @@ metadata:
 spec:
   type: NodePort
   # This helps Kubernetes know
-  # which Pods belong to this Service
-  # (and which ones this Service should forward incoming requests to).
+  # which Pods belong to this Service;
+  # more specifically, this helps Kubernetes know
+  # which (endpoint) Pods this Service should forward incoming requests to.
   selector:
-    # TODO: (2024/01/10, 08:17)
-    #       figure out whether or not
-    #       a `matchLabels:` is missing here (and in equivalent places of the other K8s manifests)!
     app: app-webapp
   ports:
     - protocol: TCP

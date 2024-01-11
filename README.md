@@ -332,6 +332,10 @@ $ utility-scripts/clean-container-artifacts.sh
 
 # How to run a containerized version of the project via Kubernetes
 
+TODO: (2024/01/11, 06:37)
+      add a few sentences about what `minikube` is
+      and motivate its use within this section
+
 install `docker`
 
 install `minikube`
