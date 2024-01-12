@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-database
+data:
+  db-engine-host: service-database
+  db-engine-port: "5432"

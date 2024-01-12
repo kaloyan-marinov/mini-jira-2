@@ -1,0 +1,89 @@
+# Kubernetes Deployment + Kubernetes Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-database
+  labels:
+    app: app-database
+spec:
+  # If you want to scale databases in Kubernetes,
+  # you should use a Kubernetes StatefulSet instead of a Kubernetes Deployment.
+  # To keep things simple, we're going to stick to a Deployment with 1 replica.
+  replicas: 1
+  # This helps Kubernetes know
+  # which Pod( replica)s belong to the currently-being-configured Deployment.
+  selector:
+    matchLabels:
+      app: app-database
+  # The following defines a blueprint for Kubernetes Pods.
+  # (
+  # In other words (and for the sake of emphasizing the point):
+  # Everything within the next stanza/section constitutes
+  # a configuration of a Kubernetes Pod,
+  # with that configuration/stanza/section residing
+  # within the configuration of the (currently-being-configured) Kubernetes Deployment.
+  # )
+  template:
+    metadata:
+      # The following is required for Pods.
+      # (
+      # When there are multiple replicas of the same Pod,
+      # each Pod will be assigned a unique name (by Kubernetes).
+      # (Utilizing) A `labels:` stanza makes it possible to
+      # identify all Pod replicas of the same (software) application.
+      # Labels do not guarantee uniqueness
+      # but establish an association between a Deployment and to all its Pod replicas.
+      # )
+      #
+      # (
+      # For other components (like Deployment(?), ConfigMap, etc.),
+      # the `labels:` stanza is optional,
+      # but it is good practice to utilize it.
+      # )
+      labels:
+        app: app-database
+    spec:
+      # There can be multiple containers in a pod
+      # but, mostly, one main application per pod.
+      containers:
+      - name: container-mini-jira-2-postgres
+        image: postgres:15.1
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: scram-sha-256
+        - name: POSTGRES_INITDB_ARGS
+          value: --auth-host=scram-sha-256
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: secret-database
+              key: secret-database-db
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret-database
+              key: secret-database-user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-database
+              key: secret-database-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-database
+spec:
+  # type: ClusterIP  # is the default `type`.
+  # This helps Kubernetes know
+  # which Pods belong to this Service;
+  # more specifically, this helps Kubernetes know
+  # which (endpoint-)Pods this Service should forward incoming requests to.
+  selector:
+    app: app-database
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

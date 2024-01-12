@@ -33,9 +33,12 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# The last element in the following list is added
+# on the advice in https://stackoverflow.com/a/62224706 .
 ALLOWED_HOSTS = [
     "testserver",
     "localhost",
+    os.environ.get("HOST_IP"),
 ]
 
 
