@@ -272,6 +272,11 @@ $ DB_ENGINE_HOST=mini-jira-2-database-server bash -c '
 ```
 
 ```bash
+# REMEMBER THAT:
+# whenener the value assigned by the next statement is changed,
+# the container-image tag
+# (which is) hardcoded within `kubernetes/webapp/deployment-and-service.yaml`
+# has to be changed as well.
 $ export HYPHENATED_YYYY_MM_DD_HH_MM=2024-01-01-10-35
 ```
 
@@ -703,6 +708,8 @@ $ minikube stop
 - currently, when the project is deployed via Kubernetes,
   running the database is achieved
   via the `kubernetes/database/deployment-and-service.yaml` manifest/file;
+  (recall the comment about how "to scale databases" in that manifest
+  to realize that it would be worthwhile to)
   figure out a more reliable way of running the database
   when the project is deployed via Kubernetes
 

@@ -47,7 +47,7 @@ spec:
       # but, mostly, one main application per pod.
       containers:
       - name: container-mini-jira-2-webapp
-        image: image-mini-jira-2:2024-01-01-10-35 
+        image: image-mini-jira-2:2024-01-01-10-35
         ports:
         - containerPort: 5000
         env:
@@ -97,7 +97,7 @@ spec:
   # This helps Kubernetes know
   # which Pods belong to this Service;
   # more specifically, this helps Kubernetes know
-  # which (endpoint) Pods this Service should forward incoming requests to.
+  # which (endpoint-)Pods this Service should forward incoming requests to.
   selector:
     app: app-webapp
   ports:

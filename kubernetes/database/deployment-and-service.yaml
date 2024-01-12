@@ -80,7 +80,7 @@ spec:
   # This helps Kubernetes know
   # which Pods belong to this Service;
   # more specifically, this helps Kubernetes know
-  # which (endpoint) Pods this Service should forward incoming requests to.
+  # which (endpoint-)Pods this Service should forward incoming requests to.
   selector:
     app: app-database
   ports:
