@@ -332,9 +332,64 @@ $ utility-scripts/clean-container-artifacts.sh
 
 # How to run a containerized version of the project via Kubernetes
 
-TODO: (2024/01/11, 06:37)
-      add a few sentences about what `minikube` is
-      and motivate its use within this section
+Let us begin with some brief-but-important background:
+
+- when Kubernetes is to be used in order to deploy a software system,
+  you have to set up <ins>a production cluster</ins>
+  
+- <ins>a production cluster</ins> is a collection of several virtual or physical machine
+  that are separate from each other and
+  that, in Kubernetes parlance, are called <ins>nodes</ins>
+
+- the <ins>nodes</ins> comprising <ins>a production cluster</ins> are broken down
+  into two categories:
+  <ins>master nodes</ins> and <ins>worker nodes</ins>,
+  with each category having its own set of responsibilities
+
+- typically, <ins>a production cluster</ins> will have
+  at least two <ins>master nodes</ins> and
+  multiple <ins>worker nodes</ins>
+
+---
+
+Now,
+if you want to test something on your local machine or
+if you want to try something out very quickly
+(such as deploying a new application or new components),
+setting up a cluster in the way outlined above will be pretty difficult
+(or maybe even impossible).
+
+Exactly for that use case,
+there is an open-source (command-line) tool called a Minikube.
+One can use that tool
+to set up a <ins>virtual</ins> one-node cluster on one's local machine,
+whereby <ins>the master processes</ins> and <ins>the worker processes</ins>
+both run on that one node.
+Furthermore, Minikube('s one node) will have a Docker container runtime pre-installed,
+making it possible (containers within) (Kubernetes) pods on that one node.
+
+Having set up such a virtual one-node node cluster on your local machine,
+you need some way to interact with that cluster,
+i.e. so you need a way to create Kubernetes components
+on the node (or: in that cluster?).
+That can be done via a command-line tool called `kubectl`.
+
+(
+
+Without going into detail about `kubectl`,
+it is important to note that:
+
+- `kubectl` is able to interact
+  not only with a Minikube cluster,
+  but also with any type of Kubernetes-cluster setup
+  (such as a cloud cluster or a hybrid cluster)
+
+- `kubectl` gets installed as a dependency
+  when Minikube is installed on one's local machine
+
+)
+
+---
 
 install `docker`
 
